@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.ayst.androidx">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
 
@@ -15,7 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <receiver
+            android:name=".receiver.NetworkReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
         <receiver
             android:name=".receiver.ActionReceiver"
             android:enabled="true"
@@ -26,7 +31,6 @@
                 <action android:name="com.topband.androidx.ACTION_WATCHDOG" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receiver.BootCompleteReceiver"
             android:enabled="true"
