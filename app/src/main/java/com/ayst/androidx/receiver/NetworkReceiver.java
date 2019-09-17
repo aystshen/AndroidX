@@ -14,6 +14,10 @@ public class NetworkReceiver extends BroadcastReceiver {
 
     private OnNetworkStateChangedListener mListener;
 
+    public NetworkReceiver() {
+        super();
+    }
+
     public NetworkReceiver(OnNetworkStateChangedListener listener) {
         mListener = listener;
     }
