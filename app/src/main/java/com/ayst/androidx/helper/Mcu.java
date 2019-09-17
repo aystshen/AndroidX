@@ -57,6 +57,21 @@ public class Mcu {
     }
 
     /**
+     * Get the boot countdown
+     * @return time
+     */
+    public int getUptime() {
+        if (null != mMcuService) {
+            try {
+                return mMcuService.getUptime();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    /**
      * Enable watchdog
      * @return <0：error
      */
@@ -87,6 +102,21 @@ public class Mcu {
     }
 
     /**
+     * Watchdog is open
+     * @return
+     */
+    public boolean watchdogIsOpen() {
+        if (null != mMcuService) {
+            try {
+                return mMcuService.watchdogIsOpen();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    /**
      * Set watchdog over time duration
      * @param duration (unit: second)
      * @return <0：error
@@ -100,5 +130,20 @@ public class Mcu {
             }
         }
         return -1;
+    }
+
+    /**
+     * Get watchdog over time duration
+     * @return
+     */
+    public int getWatchdogDuration() {
+        if (null != mMcuService) {
+            try {
+                return mMcuService.getWatchdogDuration();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 }

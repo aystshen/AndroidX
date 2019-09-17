@@ -17,10 +17,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <receiver
             android:name=".receiver.NetworkReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
+
         <receiver
             android:name=".receiver.ActionReceiver"
             android:enabled="true"
@@ -31,6 +33,7 @@
                 <action android:name="com.topband.androidx.ACTION_WATCHDOG" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".receiver.BootCompleteReceiver"
             android:enabled="true"

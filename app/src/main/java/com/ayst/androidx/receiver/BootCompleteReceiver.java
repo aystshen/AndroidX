@@ -18,7 +18,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
             Intent serviceIntent = new Intent(context, MainService.class);
             serviceIntent.putExtra(MainService.EXTRA_ACTION, MainService.COMMAND_RUN_ALL_ACTION);
-            serviceIntent.putExtra(MainService.EXTRA_DELAY, 60000);
+            serviceIntent.putExtra(MainService.EXTRA_DELAY, 5000);
             AppUtil.startService(context, serviceIntent);
         }
     }

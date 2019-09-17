@@ -3,13 +3,16 @@ package com.ayst.androidx.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.ayst.androidx.service.MainService;
 import com.ayst.androidx.util.AppUtil;
 
+/**
+ * Test:
+ *  adb shell am broadcast -a com.topband.androidx.ACTION_RUN_ALL  --include-stopped-packages com.ayst.androidx
+ */
 public class ActionReceiver extends BroadcastReceiver {
     private static final String TAG = "ActionReceiver";
 
