@@ -51,6 +51,12 @@ public class KeepLive4GAction extends BaseAction {
         super.run();
         registerNetworkReceiver();
         while (mAlive) {
+            try {
+                Thread.sleep(CHECK_PERIOD[mResetModemCnt]);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             Log.d(TAG, "run...");
 
             if (isMobileNetwork) {
@@ -86,12 +92,6 @@ public class KeepLive4GAction extends BaseAction {
                 }
             } else {
                 mResetModemCnt = 0;
-            }
-
-            try {
-                Thread.sleep(CHECK_PERIOD[mResetModemCnt]);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     }
