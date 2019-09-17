@@ -12,6 +12,10 @@ import com.ayst.androidx.util.AppUtil;
 /**
  * Test:
  *  adb shell am broadcast -a com.topband.androidx.ACTION_RUN_ALL  --include-stopped-packages com.ayst.androidx
+ *  adb shell am broadcast -a com.topband.androidx.ACTION_4G_KEEP_LIVE --es action "open" --include-stopped-packages com.ayst.androidx
+ *  adb shell am broadcast -a com.topband.androidx.ACTION_4G_KEEP_LIVE --es action "close" --include-stopped-packages com.ayst.androidx
+ *  adb shell am broadcast -a com.topband.androidx.ACTION_WATCHDOG --es action "open" --include-stopped-packages com.ayst.androidx
+ *  adb shell am broadcast -a com.topband.androidx.ACTION_WATCHDOG --es action "close" --include-stopped-packages com.ayst.androidx
  */
 public class ActionReceiver extends BroadcastReceiver {
     private static final String TAG = "ActionReceiver";
@@ -47,7 +51,7 @@ public class ActionReceiver extends BroadcastReceiver {
             actionIntent.putExtra(MainService.EXTRA_DELAY, 0);
             Bundle bundle = intent.getExtras();
             if (null != bundle) {
-                actionIntent.putExtras(bundle);
+                actionIntent.putExtra("bundle", bundle);
             }
             AppUtil.startService(context, actionIntent);
 
@@ -64,7 +68,7 @@ public class ActionReceiver extends BroadcastReceiver {
             actionIntent.putExtra(MainService.EXTRA_DELAY, 0);
             Bundle bundle = intent.getExtras();
             if (null != bundle) {
-                actionIntent.putExtras(bundle);
+                actionIntent.putExtra("bundle", bundle);
             }
             AppUtil.startService(context, actionIntent);
         }

@@ -3,8 +3,6 @@ package com.ayst.androidx.action;
 import android.content.Context;
 
 public abstract class BaseAction implements Runnable {
-    public static final String NAME = BaseAction.class.getSimpleName();
-
     protected Context mContext;
     protected boolean mAlive = true;
 
@@ -18,6 +16,7 @@ public abstract class BaseAction implements Runnable {
     }
 
     public void stop() {
+        Thread.interrupted();
         mAlive = false;
     }
 

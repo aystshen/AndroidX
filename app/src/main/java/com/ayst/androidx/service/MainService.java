@@ -17,10 +17,12 @@ import android.os.Message;
 import android.util.Log;
 
 import com.ayst.androidx.R;
+import com.ayst.androidx.action.ActionType;
 import com.ayst.androidx.action.BaseAction;
 import com.ayst.androidx.action.KeepLive4GAction;
 import com.ayst.androidx.action.WatchDogAction;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -73,7 +75,6 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand...");
         startForeground();
         if (intent == null) {
             return Service.START_NOT_STICKY;
@@ -81,7 +82,7 @@ public class MainService extends Service {
 
         int command = intent.getIntExtra(EXTRA_ACTION, COMMAND_NULL);
         int delayTime = intent.getIntExtra(EXTRA_DELAY, DEFAULT_DELAY_TIME);
-        Bundle bundle = intent.getExtras();
+        Bundle bundle = intent.getBundleExtra("bundle");
 
         Log.d(TAG, "onStartCommand, command=" + command + " delayTime=" + delayTime);
         if (command == COMMAND_NULL) {
@@ -117,14 +118,74 @@ public class MainService extends Service {
                 case COMMAND_RUN_ALL_ACTION:
                     runAllActions();
                     break;
+
+                case COMMAND_ACTION_OPEN_4G_KEEP_LIVE:
+                    openAction(ActionType.KEEP_LIVE_4G, KeepLive4GAction.class);
+                    break;
+
+                case COMMAND_ACTION_CLOSE_4G_KEEP_LIVE:
+                    closeAction(ActionType.KEEP_LIVE_4G);
+                    break;
+
+                case COMMAND_ACTION_OPEN_WATCHDOG:
+                    openAction(ActionType.WATCHDOG, WatchDogAction.class);
+                    break;
+
+                case COMMAND_ACTION_CLOSE_WATCHDOG:
+                    closeAction(ActionType.WATCHDOG);
+                    break;
+
+                case COMMAND_ACTION_CONFIG_WATCHDOG:
+                    Bundle bundle = (Bundle) msg.obj;
+                    if (null != bundle) {
+                        int timeout = bundle.getInt("timeout", 180);
+                        WatchDogAction action = (WatchDogAction) mActiveActions.get(ActionType.WATCHDOG);
+                        if (null != action) {
+                            action.setTimeout(timeout);
+                        }
+                    }
+                    break;
             }
         }
     }
 
-    private void runAction(BaseAction action) {
+    private void openAction(String name, Class clazz) {
+        Log.i(TAG, "openAction, name=" + name);
+        BaseAction action = (BaseAction) mActiveActions.get(name);
+        if (null == action) {
+            try {
+                Constructor<?> constructor = clazz.getConstructor(Context.class);
+                action = (BaseAction) constructor.newInstance(this);
+                action.open();
+                runAction(name, action);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void closeAction(String name) {
+        Log.i(TAG, "closeAction, name=" + name);
+        BaseAction action = (BaseAction) mActiveActions.get(name);
+        if (null != action) {
+            action.close();
+            stopAction(name, action);
+        }
+    }
+
+    private void runAction(String name, BaseAction action) {
         if (action.isOpen()) {
+            Log.i(TAG, "runAction, name=" + name);
             mThreadPoolExecutor.execute(action);
-            mActiveActions.put(action.NAME, action);
+            mActiveActions.put(name, action);
+        }
+    }
+
+    private void stopAction(String name, BaseAction action) {
+        if (null != action) {
+            Log.i(TAG, "stopAction, name=" + name);
+            action.stop();
+            mActiveActions.remove(name);
         }
     }
 
@@ -134,8 +195,8 @@ public class MainService extends Service {
         }
         mActiveActions.clear();
 
-        runAction(new KeepLive4GAction(this));
-        runAction(new WatchDogAction(this));
+        runAction(ActionType.KEEP_LIVE_4G, new KeepLive4GAction(this));
+        runAction(ActionType.WATCHDOG, new WatchDogAction(this));
     }
 
     /**

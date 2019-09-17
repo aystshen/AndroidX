@@ -64,7 +64,7 @@ public class WatchDogAction extends BaseAction {
         mMcu.heartbeat();
     }
 
-    private void setTimeout(int timeout) {
+    public void setTimeout(int timeout) {
         if (timeout >= TIMEOUT_MIN) {
             if (mMcu.setWatchdogDuration(timeout) >= 0) {
                 mTimeout = timeout;
