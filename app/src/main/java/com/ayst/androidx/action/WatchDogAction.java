@@ -49,7 +49,7 @@ public class WatchDogAction extends BaseAction {
     @Override
     public boolean isOpen() {
         if (AppUtil.isFirstRun(mContext)) {
-            if ("1".equals(AppUtil.getProperty("ro.androidx.watchdog", "0"))) {
+            if ("1".equals(AppUtil.getProperty("persist.androidx.watchdog", "0"))) {
                 Log.i(TAG, "isOpen, The first run, it opens by default.");
                 open();
             } else {

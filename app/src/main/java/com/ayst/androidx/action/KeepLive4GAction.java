@@ -3,6 +3,7 @@ package com.ayst.androidx.action;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.helper.Modem;
@@ -10,11 +11,9 @@ import com.ayst.androidx.interfaces.OnNetworkStateChangedListener;
 import com.ayst.androidx.receiver.NetworkReceiver;
 import com.ayst.androidx.util.AppUtil;
 import com.ayst.androidx.util.NetworkUtils;
-import com.ayst.androidx.util.SPUtils;
 
 public class KeepLive4GAction extends BaseAction {
     private static final String TAG = "KeepLive4GAction";
-    private static final String KEY_4G = "4g_keep_live";
 
     /*
      * 检查网络时重试间隔
@@ -106,18 +105,18 @@ public class KeepLive4GAction extends BaseAction {
 
     @Override
     public void open() {
-        SPUtils.get(mContext).saveData(KEY_4G, true);
+        AppUtil.setProperty("persist.androidx.4g_keep_live", "1");
     }
 
     @Override
     public void close() {
-        SPUtils.get(mContext).saveData(KEY_4G, false);
+        AppUtil.setProperty("persist.androidx.4g_keep_live", "0");
     }
 
     @Override
     public boolean isOpen() {
-        return SPUtils.get(mContext).getData(KEY_4G, "1".equals(AppUtil.
-                getProperty("ro.androidx.4g_keep_live", "0")));
+        return TextUtils.equals("1", AppUtil.getProperty(
+                "persist.androidx.4g_keep_live", "0"));
     }
 
     private void registerNetworkReceiver() {
