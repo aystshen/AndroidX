@@ -1,13 +1,8 @@
 package com.ayst.androidx.service;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -16,7 +11,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.ayst.androidx.R;
 import com.ayst.androidx.action.ActionType;
 import com.ayst.androidx.action.BaseAction;
 import com.ayst.androidx.action.KeepLive4GAction;
@@ -75,7 +69,6 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground();
         if (intent == null) {
             return Service.START_NOT_STICKY;
         }
@@ -197,32 +190,5 @@ public class MainService extends Service {
 
         runAction(ActionType.KEEP_LIVE_4G, new KeepLive4GAction(this));
         runAction(ActionType.WATCHDOG, new WatchDogAction(this));
-    }
-
-    /**
-     * Android O(8.1) 开始，启动Service不再允许使用context.startService(intent)，
-     * 而改用context.startForegroundService(intent)，并且启动Service后必须调用
-     * startForeground()接口，否则Service将被系统强制结束掉。
-     */
-    private void startForeground() {
-        Notification.Builder builder = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel chan = new NotificationChannel(ID, NAME, NotificationManager.IMPORTANCE_HIGH);
-            chan.enableLights(true);
-            chan.setLightColor(Color.RED);
-            chan.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            if (manager != null) {
-                manager.createNotificationChannel(chan);
-            }
-            builder = new Notification.Builder(this, ID);
-        } else {
-            builder = new Notification.Builder(this.getApplicationContext());
-        }
-        Notification notification = builder.setContentTitle("AndroidX")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setWhen(System.currentTimeMillis())
-                .build();
-        startForeground(1, notification);
     }
 }
