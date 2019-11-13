@@ -5,10 +5,10 @@ interface IMcuService
 {
     int heartbeat();
     int setUptime(int time);
+    int getUptime();
     int openWatchdog();
     int closeWatchdog();
     int setWatchdogDuration(int duration);
-    int getUptime();
-    boolean watchdogIsOpen();
     int getWatchdogDuration();
+    boolean watchdogIsOpen();
 }

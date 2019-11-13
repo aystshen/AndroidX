@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.ayst.androidx">
+    package="com.ayst.androidx"
+    android:sharedUserId="android.uid.system">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
@@ -18,24 +20,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <service
+            android:name=".service.ModemService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".service.WatchdogService"
+            android:enabled="true"
+            android:exported="true" />
 
         <receiver
             android:name=".receiver.NetworkReceiver"
             android:enabled="true"
             android:exported="true" />
-
-        <receiver
-            android:name=".receiver.ActionReceiver"
-            android:permission="com.ayst.androidx.permission.SELF_BROADCAST"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.topband.androidx.ACTION_RUN_ALL" />
-                <action android:name="com.topband.androidx.ACTION_4G_KEEP_LIVE" />
-                <action android:name="com.topband.androidx.ACTION_WATCHDOG" />
-            </intent-filter>
-        </receiver>
-
         <receiver
             android:name=".receiver.BootCompleteReceiver"
             android:enabled="true"
@@ -45,10 +42,6 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".service.MainService"
-            android:enabled="true"
-            android:exported="true" />
     </application>
 
 </manifest>

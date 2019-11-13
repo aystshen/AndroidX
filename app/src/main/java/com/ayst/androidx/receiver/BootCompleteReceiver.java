@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.ayst.androidx.service.MainService;
-import com.ayst.androidx.util.AppUtil;
+import com.ayst.androidx.service.ModemService;
+import com.ayst.androidx.service.WatchdogService;
 
 public class BootCompleteReceiver extends BroadcastReceiver {
     private static final String TAG = "BootCompleteReceiver";
@@ -16,10 +16,8 @@ public class BootCompleteReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         Log.d(TAG, "onReceive, action = " + action);
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
-            Intent serviceIntent = new Intent(context, MainService.class);
-            serviceIntent.putExtra(MainService.EXTRA_ACTION, MainService.COMMAND_RUN_ALL_ACTION);
-            serviceIntent.putExtra(MainService.EXTRA_DELAY, 5000);
-            AppUtil.startService(context, serviceIntent);
+            context.startService(new Intent(context, ModemService.class));
+            context.startService(new Intent(context, WatchdogService.class));
         }
     }
 }

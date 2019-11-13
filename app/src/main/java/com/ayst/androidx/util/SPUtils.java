@@ -8,6 +8,8 @@ import android.content.SharedPreferences.Editor;
 public class SPUtils {
     private static final String SP = "config";
 
+    public static final String KEY_4G_KEEP_LIVE = "4g_keep_live";
+
     private static SPUtils instance;
     private static SharedPreferences mSp = null;
 
@@ -16,114 +18,100 @@ public class SPUtils {
     }
 
     public static SPUtils get(Context context) {
-        if (instance == null) {
+        if (instance == null)
             instance = new SPUtils(context);
-        }
         return instance;
     }
 
     /**
-     * 保存数据
+     * Save data
      *
-     * @param context
-     * @param key
-     * @param defValue
-     * @return
+     * @param key preference key
+     * @param value preference value
      */
     public void saveData(String key, String value) {
         Editor editor = mSp.edit();
         editor.putString(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     /**
-     * 保存数据
+     * Save data
      *
-     * @param context
-     * @param key
-     * @param defValue
-     * @return
+     * @param key preference key
+     * @param value preference value
      */
     public void saveData(String key, boolean value) {
         Editor editor = mSp.edit();
         editor.putBoolean(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     /**
-     * 保存数据
+     * Save data
      *
-     * @param context
-     * @param key
-     * @param defValue
-     * @return
+     * @param key preference key
+     * @param value preference value
      */
     public void saveData(String key, int value) {
         Editor editor = mSp.edit();
         editor.putInt(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     /**
-     * 保存数据
+     * Save data
      *
-     * @param context
-     * @param key
-     * @param defValue
-     * @return
+     * @param key preference key
+     * @param value preference value
      */
     public void saveData(String key, float value) {
         Editor editor = mSp.edit();
         editor.putFloat(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     /**
-     * 取出数据
+     * Get data
      *
-     * @param context
-     * @param key
-     * @param defValue
-     * @return
+     * @param key preference key
+     * @param defValue default value
+     * @return value
      */
     public String getData(String key, String defValue) {
         return mSp.getString(key, defValue);
     }
 
     /**
-     * 取出数据
+     * Get data
      *
-     * @param context
-     * @param key
-     * @param defValue
-     * @return
+     * @param key preference key
+     * @param defValue default value
+     * @return value
      */
     public boolean getData(String key, boolean defValue) {
         return mSp.getBoolean(key, defValue);
     }
 
     /**
-     * 取出数据
+     * Get data
      *
-     * @param context
-     * @param key
-     * @param defValue
-     * @return
+     * @param key preference key
+     * @param defValue default value
+     * @return value
      */
     public int getData(String key, int defValue) {
         return mSp.getInt(key, defValue);
     }
 
     /**
-     * 取出数据
+     * Get data
      *
-     * @param context
-     * @param key
-     * @param defValue
-     * @return
+     * @param key preference key
+     * @param defValue default value
+     * @return value
      */
     public float getData(String key, float defValue) {
         return mSp.getFloat(key, defValue);
     }
-
 }

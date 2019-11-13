@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.interfaces.OnNetworkStateChangedListener;
@@ -27,33 +28,31 @@ public class NetworkReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         Log.d(TAG, "action: " + action);
 
-        switch (action) {
-            case ConnectivityManager.CONNECTIVITY_ACTION:
-                boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-                if (noConnectivity) {
+        if (TextUtils.equals(action, ConnectivityManager.CONNECTIVITY_ACTION)) {
+            boolean noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+            if (noConnectivity) {
+                if (mListener != null) {
+                    mListener.onLostConnectivity();
+                }
+            } else {
+                if (NetworkUtils.isMobileData()) {
                     if (mListener != null) {
-                        mListener.onLostConnectivity();
+                        mListener.onMobileDataConnected();
+                    }
+                } else if (NetworkUtils.isWifiConnected()) {
+                    if (mListener != null) {
+                        mListener.onWiFiConnected();
+                    }
+                } else if (NetworkUtils.isEthernet()) {
+                    if (mListener != null) {
+                        mListener.onEthernetConnected();
                     }
                 } else {
-                    if (NetworkUtils.isMobileData()) {
-                        if (mListener != null) {
-                            mListener.onMobileDataConnected();
-                        }
-                    } else if (NetworkUtils.isWifiConnected()) {
-                        if (mListener != null) {
-                            mListener.onWiFiConnected();
-                        }
-                    } else if (NetworkUtils.isEthernet()) {
-                        if (mListener != null) {
-                            mListener.onEthernetConnected();
-                        }
-                    } else {
-                        if (mListener != null) {
-                            mListener.onUnknownConnected();
-                        }
+                    if (mListener != null) {
+                        mListener.onUnknownConnected();
                     }
                 }
-                break;
+            }
         }
     }
 }
