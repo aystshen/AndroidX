@@ -4,16 +4,27 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.IWatchdogService;
 import com.ayst.androidx.supply.Mcu;
+import com.ayst.androidx.util.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 public class WatchdogService extends Service {
 
     private static final String TAG = "WatchdogService";
 
     private static final int TIMEOUT_MIN = 60;
+
+    /**
+     * Recovery upgrade status storage file
+     */
+    private static final String RECOVERY_DIR = "/cache/recovery";
+    private static final File WATCHDOG_FLAG_FILE = new File(RECOVERY_DIR + "/last_watchdog_flag");
 
     private boolean mAlive = true;
     private int mTimeout;
@@ -104,9 +115,39 @@ public class WatchdogService extends Service {
             mHeartbeatThread.start();
         } else {
             Log.w(TAG, "onStartCommand, watchdog is off.");
+            checkLastFlag();
         }
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void checkLastFlag() {
+        String flag = null;
+        try {
+            flag = FileUtils.readFile(WATCHDOG_FLAG_FILE);
+        } catch (IOException e) {
+            Log.w(TAG, "checkLastFlag, " + e.getMessage());
+        }
+        Log.i(TAG, "checkLastFlag, flag = " + flag);
+
+        if (!TextUtils.isEmpty(flag)) {
+            String[] array = flag.split("\\$");
+            for (String param : array) {
+                if (param.startsWith("watchdog")) {
+                    String value = param.substring(param.indexOf('=') + 1);
+                    Log.i(TAG, "checkLastFlag, watchdog=" + value);
+
+                    if (TextUtils.equals("true", value)) {
+                        try {
+                            mService.openWatchdog();
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                WATCHDOG_FLAG_FILE.delete();
+            }
+        }
     }
 
     private Runnable mHeartbeatRunnable = new Runnable() {
