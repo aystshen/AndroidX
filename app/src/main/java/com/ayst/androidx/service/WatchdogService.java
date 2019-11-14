@@ -37,6 +37,7 @@ public class WatchdogService extends Service {
     private final IWatchdogService.Stub mService = new IWatchdogService.Stub() {
         @Override
         public boolean openWatchdog() throws RemoteException {
+            Log.i(TAG, "openWatchdog");
             if (!watchdogIsOpen()) {
                 if (mMcu.openWatchdog() == 0) {
                     mHeartbeatThread = new Thread(mHeartbeatRunnable);
@@ -51,10 +52,13 @@ public class WatchdogService extends Service {
 
         @Override
         public boolean closeWatchdog() throws RemoteException {
+            Log.i(TAG, "closeWatchdog");
             if (watchdogIsOpen()) {
                 if (mMcu.closeWatchdog() == 0) {
                     mAlive = false;
-                    mHeartbeatThread.interrupt();
+                    if (null != mHeartbeatThread) {
+                        mHeartbeatThread.interrupt();
+                    }
                 } else {
                     Log.e(TAG, "closeWatchdog, failed.");
                     return false;
@@ -65,6 +69,7 @@ public class WatchdogService extends Service {
 
         @Override
         public boolean setWatchdogTimeout(int timeout) throws RemoteException {
+            Log.i(TAG, "setWatchdogTimeout, timeout=" + timeout);
             if (timeout >= TIMEOUT_MIN) {
                 if (mMcu.setWatchdogDuration(timeout) == 0) {
                     mTimeout = timeout;

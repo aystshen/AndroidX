@@ -20,19 +20,30 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <service
             android:name=".service.ModemService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.ayst.androidx.MODEM_SERVICE"/>
+            </intent-filter>
+        </service>
+
         <service
             android:name=".service.WatchdogService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.ayst.androidx.WATCHDOG_SERVICE"/>
+            </intent-filter>
+        </service>
 
         <receiver
             android:name=".receiver.NetworkReceiver"
             android:enabled="true"
             android:exported="true" />
+
         <receiver
             android:name=".receiver.BootCompleteReceiver"
             android:enabled="true"

@@ -63,6 +63,7 @@ public class ModemService extends Service {
     private final IModemService.Stub mService = new IModemService.Stub() {
         @Override
         public boolean open4gKeepLive() throws RemoteException {
+            Log.i(TAG, "open4gKeepLive");
             if (!keepLiveIsOpen()) {
                 mKeepLiveThread = new Thread(mKeepLiveRunnable);
                 mKeepLiveThread.start();
@@ -74,6 +75,7 @@ public class ModemService extends Service {
 
         @Override
         public boolean close4gKeepLive() throws RemoteException {
+            Log.i(TAG, "close4gKeepLive");
             if (keepLiveIsOpen()) {
                 mAlive = false;
                 if (null != mKeepLiveThread) {
