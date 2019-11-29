@@ -39,6 +39,15 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".service.OtgService"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.ayst.androidx.OTG_SERVICE"/>
+            </intent-filter>
+        </service>
+
         <receiver
             android:name=".receiver.NetworkReceiver"
             android:enabled="true"

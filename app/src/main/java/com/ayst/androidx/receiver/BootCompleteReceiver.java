@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ayst.androidx.service.ModemService;
+import com.ayst.androidx.service.OtgService;
 import com.ayst.androidx.service.WatchdogService;
 
 public class BootCompleteReceiver extends BroadcastReceiver {
@@ -18,6 +19,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
             context.startService(new Intent(context, ModemService.class));
             context.startService(new Intent(context, WatchdogService.class));
+            context.startService(new Intent(context, OtgService.class));
         }
     }
 }
