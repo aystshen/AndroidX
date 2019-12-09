@@ -8,8 +8,13 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.IWatchdogService;
+import com.ayst.androidx.event.MessageEvent;
 import com.ayst.androidx.supply.Mcu;
 import com.ayst.androidx.util.FileUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,6 +115,8 @@ public class WatchdogService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand...");
 
+        EventBus.getDefault().register(this);
+
         if (mMcu.watchdogIsOpen()) {
             mHeartbeatThread = new Thread(mHeartbeatRunnable);
             mHeartbeatThread.start();
@@ -120,6 +127,32 @@ public class WatchdogService extends Service {
 
         return super.onStartCommand(intent, flags, startId);
     }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        switch (event.getMessage()) {
+            case MessageEvent.MSG_OPEN_WATCHDOG:
+                try {
+                    mService.openWatchdog();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case MessageEvent.MSG_CLOSE_WATCHDOG:
+                try {
+                    mService.closeWatchdog();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+    };
 
     private void checkLastFlag() {
         String flag = null;

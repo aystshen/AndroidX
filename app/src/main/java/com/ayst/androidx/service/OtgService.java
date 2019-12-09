@@ -8,13 +8,20 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.IOtgService;
+import com.ayst.androidx.event.MessageEvent;
 import com.ayst.androidx.util.AppUtils;
 import com.ayst.androidx.util.ShellUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 public class OtgService extends Service {
 
     private static final String TAG = "OtgService";
     private static final String FORCE_USB_MODE_FILE = "/sys/bus/platform/drivers/usb20_otg/force_usb_mode";
+
+    private static final String USB_MODE_AUTO = "0";
+    private static final String USB_MODE_HOST = "1";
+    private static final String USB_MODE_DEVICE = "2";
 
     public OtgService() {
     }
@@ -41,6 +48,16 @@ public class OtgService extends Service {
             boolean success = result.errorMsg.isEmpty();
             if (success) {
                 AppUtils.setProperty("persist.sys.otg_mode", mode);
+                if (TextUtils.equals(USB_MODE_HOST, mode)) {
+                    if (TextUtils.equals("1", AppUtils.getProperty(
+                            "ro.androidx.watchdog", "0"))) {
+                        Log.i(TAG, "setOtgMode, [USB_MODE_HOST] Reopen the watchdog");
+                        EventBus.getDefault().post(new MessageEvent(MessageEvent.MSG_OPEN_WATCHDOG));
+                    }
+                } else {
+                    Log.i(TAG, "setOtgMode, [USB_MODE_DEVICE|USB_MODE_AUTO] Close the watchdog");
+                    EventBus.getDefault().post(new MessageEvent(MessageEvent.MSG_CLOSE_WATCHDOG));
+                }
             }
             return success;
         }
