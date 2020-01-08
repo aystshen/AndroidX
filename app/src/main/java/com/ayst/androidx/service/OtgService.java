@@ -27,12 +27,12 @@ public class OtgService extends Service {
     private static final String USB_MODE_DEVICE = "2";
 
     private Otg mCurOtg;
-    private static List<Otg> mOtgs = new ArrayList<>();
+    private static List<Otg> sOtgs = new ArrayList<>();
 
     static {
-        mOtgs.add(new Otg("/sys/devices/platform/ff770000.syscon/ff770000.syscon:usb2-phy@e450/otg_mode",
+        sOtgs.add(new Otg("/sys/devices/platform/ff770000.syscon/ff770000.syscon:usb2-phy@e450/otg_mode",
                 "peripheral", "host", "otg"));
-        mOtgs.add(new Otg("/sys/bus/platform/drivers/usb20_otg/force_usb_mode",
+        sOtgs.add(new Otg("/sys/bus/platform/drivers/usb20_otg/force_usb_mode",
                 "0", "1", "2"));
     }
 
@@ -43,7 +43,7 @@ public class OtgService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        for (Otg otg : mOtgs) {
+        for (Otg otg : sOtgs) {
             File file = new File(otg.file);
             if (file.exists()) {
                 mCurOtg = otg;
