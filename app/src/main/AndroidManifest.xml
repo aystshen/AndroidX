@@ -24,28 +24,41 @@
         <service
             android:name=".service.ModemService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.ayst.androidx.MODEM_SERVICE"/>
+                <action android:name="com.ayst.androidx.MODEM_SERVICE" />
             </intent-filter>
         </service>
 
         <service
             android:name=".service.WatchdogService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.ayst.androidx.WATCHDOG_SERVICE"/>
+                <action android:name="com.ayst.androidx.WATCHDOG_SERVICE" />
             </intent-filter>
         </service>
 
         <service
             android:name=".service.OtgService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.ayst.androidx.OTG_SERVICE"/>
+                <action android:name="com.ayst.androidx.OTG_SERVICE" />
             </intent-filter>
+        </service>
+
+        <service
+            android:name=".service.KeyInterceptService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibilityservice" />
         </service>
 
         <receiver
