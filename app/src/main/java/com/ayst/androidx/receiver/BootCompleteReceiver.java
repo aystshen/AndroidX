@@ -22,7 +22,11 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             context.startService(new Intent(context, WatchdogService.class));
             context.startService(new Intent(context, OtgService.class));
 
-            AppUtils.openAccessibilityService(context);
+            if ("1".equals(AppUtils.getProperty("persist.sys.intercept_key", "0"))) {
+                AppUtils.openAccessibilityService(context);
+            } else {
+                AppUtils.closeAccessibilityService(context);
+            }
         }
     }
 }
