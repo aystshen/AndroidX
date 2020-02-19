@@ -8,6 +8,7 @@ import android.util.Log;
 import com.ayst.androidx.service.ModemService;
 import com.ayst.androidx.service.OtgService;
 import com.ayst.androidx.service.WatchdogService;
+import com.ayst.androidx.util.AppUtils;
 
 public class BootCompleteReceiver extends BroadcastReceiver {
     private static final String TAG = "BootCompleteReceiver";
@@ -20,6 +21,8 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             context.startService(new Intent(context, ModemService.class));
             context.startService(new Intent(context, WatchdogService.class));
             context.startService(new Intent(context, OtgService.class));
+
+            AppUtils.openAccessibilityService(context);
         }
     }
 }

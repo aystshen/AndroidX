@@ -1,7 +1,9 @@
 package com.ayst.androidx.util;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -10,14 +12,19 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.accessibility.AccessibilityManager;
+
+import com.ayst.androidx.service.KeyInterceptService;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -461,5 +468,71 @@ public class AppUtils {
      */
     public static String getUUID() {
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    /**
+     * 关闭无障碍服务
+     *
+     * @param context
+     */
+    public static void closeAccessibilityService(Context context) {
+        if (isAccessibilityServiceEnabled(context)) {
+            String enabledServicesSetting = Settings.Secure.getString(context.getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            ComponentName selfComponentName = new ComponentName(context.getPackageName(),
+                    KeyInterceptService.class.getCanonicalName());
+            String flattenToString = selfComponentName.flattenToString();
+            enabledServicesSetting = enabledServicesSetting.replace(":" + flattenToString, "");
+
+            Settings.Secure.putString(context.getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                    enabledServicesSetting);
+        }
+    }
+
+    /**
+     * 开启无障碍服务
+     *
+     * @param context
+     */
+    public static void openAccessibilityService(Context context) {
+        if (!isAccessibilityServiceEnabled(context)) {
+            String enabledServicesSetting = Settings.Secure.getString(context.getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            ComponentName selfComponentName = new ComponentName(context.getPackageName(),
+                    KeyInterceptService.class.getCanonicalName());
+            String flattenToString = selfComponentName.flattenToString();
+            if (enabledServicesSetting == null ||
+                    !enabledServicesSetting.contains(flattenToString)) {
+                enabledServicesSetting += ":" + flattenToString;
+            }
+            Settings.Secure.putString(context.getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                    enabledServicesSetting);
+            Settings.Secure.putInt(context.getContentResolver(),
+                    Settings.Secure.ACCESSIBILITY_ENABLED,
+                    1);
+        }
+    }
+
+    /**
+     * 判断无障碍服务是否开启
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isAccessibilityServiceEnabled(Context context) {
+        AccessibilityManager accessibilityManager = (AccessibilityManager) context.getSystemService(
+                Context.ACCESSIBILITY_SERVICE);
+        if (accessibilityManager != null) {
+            List<AccessibilityServiceInfo> accessibilityServices = accessibilityManager
+                    .getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+            for (AccessibilityServiceInfo info : accessibilityServices) {
+                if (info.getId().contains(context.getPackageName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
