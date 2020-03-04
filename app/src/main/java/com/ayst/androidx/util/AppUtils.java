@@ -17,7 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityManager;
 
-import com.ayst.androidx.service.KeyInterceptService;
+import com.ayst.androidx.service.KeyInterceptImplService;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -480,7 +480,7 @@ public class AppUtils {
             String enabledServicesSetting = Settings.Secure.getString(context.getContentResolver(),
                     Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
             ComponentName selfComponentName = new ComponentName(context.getPackageName(),
-                    KeyInterceptService.class.getCanonicalName());
+                    KeyInterceptImplService.class.getCanonicalName());
             String flattenToString = selfComponentName.flattenToString();
             enabledServicesSetting = enabledServicesSetting.replace(":" + flattenToString, "");
 
@@ -500,7 +500,7 @@ public class AppUtils {
             String enabledServicesSetting = Settings.Secure.getString(context.getContentResolver(),
                     Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
             ComponentName selfComponentName = new ComponentName(context.getPackageName(),
-                    KeyInterceptService.class.getCanonicalName());
+                    KeyInterceptImplService.class.getCanonicalName());
             String flattenToString = selfComponentName.flattenToString();
             if (enabledServicesSetting == null ||
                     !enabledServicesSetting.contains(flattenToString)) {
