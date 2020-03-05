@@ -4,10 +4,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.text.TextUtils;
 
 import com.ayst.androidx.IKeyInterceptService;
 import com.ayst.androidx.util.AppUtils;
+import com.ayst.androidx.util.SPUtils;
 
 public class KeyInterceptService extends Service {
 
@@ -24,19 +24,21 @@ public class KeyInterceptService extends Service {
         @Override
         public void openKeyIntercept() throws RemoteException {
             AppUtils.openAccessibilityService(getApplicationContext());
-            AppUtils.setProperty("persist.sys.intercept_key", "1");
+            SPUtils.get(KeyInterceptService.this)
+                    .saveData(SPUtils.KEY_KEY_INTERCEPT, true);
         }
 
         @Override
         public void closeKeyIntercept() throws RemoteException {
             AppUtils.closeAccessibilityService(getApplicationContext());
-            AppUtils.setProperty("persist.sys.intercept_key", "0");
+            SPUtils.get(KeyInterceptService.this)
+                    .saveData(SPUtils.KEY_KEY_INTERCEPT, false);
         }
 
         @Override
         public boolean isOpen() throws RemoteException {
-            return TextUtils.equals("1", AppUtils.getProperty(
-                    "persist.sys.intercept_key", "0"));
+            return SPUtils.get(KeyInterceptService.this)
+                    .getData(SPUtils.KEY_KEY_INTERCEPT, false);
         }
     };
 }
