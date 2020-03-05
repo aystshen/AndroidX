@@ -10,6 +10,7 @@ import com.ayst.androidx.service.ModemService;
 import com.ayst.androidx.service.OtgService;
 import com.ayst.androidx.service.WatchdogService;
 import com.ayst.androidx.util.AppUtils;
+import com.ayst.androidx.util.SPUtils;
 
 public class BootCompleteReceiver extends BroadcastReceiver {
     private static final String TAG = "BootCompleteReceiver";
@@ -24,7 +25,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             context.startService(new Intent(context, WatchdogService.class));
             context.startService(new Intent(context, OtgService.class));
 
-            if ("1".equals(AppUtils.getProperty("persist.sys.intercept_key", "0"))) {
+            if (SPUtils.get(context).getData(SPUtils.KEY_KEY_INTERCEPT, false)) {
                 AppUtils.openAccessibilityService(context);
             } else {
                 AppUtils.closeAccessibilityService(context);
