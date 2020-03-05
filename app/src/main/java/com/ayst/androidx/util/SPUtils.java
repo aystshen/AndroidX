@@ -9,6 +9,7 @@ public class SPUtils {
     private static final String SP = "config";
 
     public static final String KEY_4G_KEEP_LIVE = "4g_keep_live";
+    public static final String KEY_LOG2FILE = "log2file";
 
     private static SPUtils instance;
     private static SharedPreferences mSp = null;

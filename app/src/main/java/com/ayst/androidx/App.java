@@ -31,8 +31,10 @@ public class App extends Application {
 
         boolean watchdog = TextUtils.equals("1", AppUtils.getProperty("ro.androidx.watchdog", "0"));
         boolean keepLive4g = TextUtils.equals("1", AppUtils.getProperty("ro.androidx.4g_keep_live", "0"));
+        boolean log2file = TextUtils.equals("1", AppUtils.getProperty("ro.androidx.log2file", "1"));
         Log.i(TAG, "loadDefaultConfig, watchdog=" + watchdog);
         Log.i(TAG, "loadDefaultConfig, keepLive4g=" + keepLive4g);
+        Log.i(TAG, "loadDefaultConfig, log2file=" + log2file);
 
         if (watchdog) {
             mMcu.openWatchdog();
@@ -41,5 +43,6 @@ public class App extends Application {
         }
 
         SPUtils.get(this).saveData(SPUtils.KEY_4G_KEEP_LIVE, keepLive4g);
+        SPUtils.get(this).saveData(SPUtils.KEY_LOG2FILE, log2file);
     }
 }
