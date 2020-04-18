@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.ayst.androidx.permission.SELF_BROADCAST" />
+    <uses-permission android:name="android.permission.CHANGE_COMPONENT_ENABLED_STATE" />
 
     <application
         android:name=".App"
@@ -22,7 +23,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <service
+            android:name=".service.AppEnableService"
+            android:enabled="true"
+            android:exported="true" />
         <service
             android:name=".service.KeyInterceptService"
             android:enabled="true"
@@ -31,7 +35,6 @@
                 <action android:name="com.ayst.androidx.KEY_INTERCEPT_SERVICE" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.Log2fileService"
             android:enabled="true"
@@ -40,7 +43,6 @@
                 <action android:name="com.ayst.androidx.LOG2FILE_SERVICE" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.ModemService"
             android:enabled="true"
@@ -49,7 +51,6 @@
                 <action android:name="com.ayst.androidx.MODEM_SERVICE" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.WatchdogService"
             android:enabled="true"
@@ -58,7 +59,6 @@
                 <action android:name="com.ayst.androidx.WATCHDOG_SERVICE" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.OtgService"
             android:enabled="true"
@@ -67,7 +67,6 @@
                 <action android:name="com.ayst.androidx.OTG_SERVICE" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.KeyInterceptImplService"
             android:enabled="true"
@@ -86,16 +85,14 @@
             android:name=".receiver.NetworkReceiver"
             android:enabled="true"
             android:exported="true" />
-
         <receiver
             android:name=".receiver.BootCompleteReceiver"
             android:enabled="true"
             android:exported="true">
-            <intent-filter>
+            <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>
