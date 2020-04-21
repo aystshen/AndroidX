@@ -58,10 +58,14 @@ public class AppEnableService extends Service {
             for (String pkgName : mEnableApps) {
                 if (!TextUtils.isEmpty(pkgName)
                 && pkgName.contains(".")) {
-                    pm.setApplicationEnabledSetting(
-                            pkgName,
-                            PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
-                            0);
+                    try {
+                        pm.setApplicationEnabledSetting(
+                                pkgName,
+                                PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+                                0);
+                    } catch (Exception e) {
+                        Log.e(TAG, "setApplicationEnabledSetting, " + e.getMessage());
+                    }
 
                     Log.i(TAG, pkgName + " Enabled.");
                 }
