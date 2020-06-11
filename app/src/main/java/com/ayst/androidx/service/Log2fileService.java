@@ -91,8 +91,8 @@ public class Log2fileService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        sLogcatDir = AppUtils.getDir(this, "log/android");
-        sKmsgDir = AppUtils.getDir(this, "log/kernel");
+        sLogcatDir = AppUtils.getDir(this, "lastlog/android");
+        sKmsgDir = AppUtils.getDir(this, "lastlog/kernel");
     }
 
     @Override
