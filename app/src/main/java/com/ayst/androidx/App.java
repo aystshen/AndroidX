@@ -19,6 +19,9 @@ public class App extends Application {
 
         Log.i(TAG, "AndroidX, version: " + AppUtils.getVersionName(this));
 
+        // 退出开机动画
+        AppUtils.setProperty("service.bootanim.tb.exit", "1");
+
         mMcu = new Mcu(this);
 
         if (AppUtils.isFirstRun(this)) {
