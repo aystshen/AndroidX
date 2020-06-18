@@ -22,18 +22,25 @@ public class OtgService extends Service {
 
     private static final String TAG = "OtgService";
 
+    private static final int OTG_TYPE_DEFAULT = 0;  // 默认，如：RK3288
+    private static final int OTG_TYPE_C = 1;        // TYPE-C
+    private static final int OTG_TYPE_USB3 = 2;     // USB3.0
+
     private static final String USB_MODE_AUTO = "0";
     private static final String USB_MODE_HOST = "1";
     private static final String USB_MODE_DEVICE = "2";
 
+    private int mCurOtgType = OTG_TYPE_DEFAULT;
     private Otg mCurOtg;
     private static List<Otg> sOtgs = new ArrayList<>();
 
     static {
-        sOtgs.add(new Otg("/sys/devices/platform/ff770000.syscon/ff770000.syscon:usb2-phy@e450/otg_mode",
-                "peripheral", "host", "otg"));
         sOtgs.add(new Otg("/sys/bus/platform/drivers/usb20_otg/force_usb_mode",
                 "0", "1", "2"));
+        sOtgs.add(new Otg("/sys/devices/platform/ff770000.syscon/ff770000.syscon:usb2-phy@e450/otg_mode",
+                "peripheral", "host", "otg"));
+        sOtgs.add(new Otg("/sys/devices/platform/usb0/dwc3_mode",
+                "peripheral", "host", "otg"));
     }
 
     public OtgService() {
@@ -43,13 +50,13 @@ public class OtgService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        for (Otg otg : sOtgs) {
-            File file = new File(otg.file);
-            if (file.exists()) {
-                mCurOtg = otg;
-                Log.i(TAG, "onCreate, current otg: " + otg.toString());
-                break;
-            }
+        String typeStr = AppUtils.getProperty("ro.otg.type", OTG_TYPE_DEFAULT + "");
+        int type = Integer.parseInt(typeStr);
+        if (type < sOtgs.size()) {
+            mCurOtg = sOtgs.get(type);
+            mCurOtgType = type;
+        } else {
+            mCurOtg = sOtgs.get(mCurOtgType);
         }
     }
 
@@ -64,7 +71,12 @@ public class OtgService extends Service {
         public boolean setOtgMode(String mode) throws RemoteException {
             boolean success = false;
             if (null != mCurOtg) {
-                ShellUtils.CommandResult result = ShellUtils.execCmd(
+                ShellUtils.CommandResult result;
+                if (mCurOtgType == OTG_TYPE_USB3
+                    && TextUtils.equals(USB_MODE_HOST, mode)) {
+                    ShellUtils.execCmd("echo " + mCurOtg.getMode(USB_MODE_AUTO) + " > " + mCurOtg.file, true);
+                }
+                result = ShellUtils.execCmd(
                         "echo " + mCurOtg.getMode(mode) + " > " + mCurOtg.file, true);
 
                 Log.i(TAG, "setOtgMode, result: " + result);
