@@ -25,6 +25,7 @@ public class OtgService extends Service {
     private static final int OTG_TYPE_DEFAULT = 0;  // 默认，如：RK3288
     private static final int OTG_TYPE_C = 1;        // TYPE-C
     private static final int OTG_TYPE_USB3 = 2;     // USB3.0
+    private static final int OTG_TYPE_3326 = 3;     // RK3326
 
     private static final String USB_MODE_AUTO = "0";
     private static final String USB_MODE_HOST = "1";
@@ -40,6 +41,8 @@ public class OtgService extends Service {
         sOtgs.add(new Otg("/sys/devices/platform/ff770000.syscon/ff770000.syscon:usb2-phy@e450/otg_mode",
                 "peripheral", "host", "otg"));
         sOtgs.add(new Otg("/sys/devices/platform/usb0/dwc3_mode",
+                "peripheral", "host", "otg"));
+        sOtgs.add(new Otg("/sys/devices/platform/ff2c0000.syscon/ff2c0000.syscon:usb2-phy@100/otg_mode",
                 "peripheral", "host", "otg"));
     }
 
