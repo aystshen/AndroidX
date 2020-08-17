@@ -199,7 +199,7 @@ public final class ShellUtils {
         StringBuilder errorMsg = null;
         DataOutputStream os = null;
         try {
-            process = Runtime.getRuntime().exec(isRooted ? "su" : "sh");
+            process = Runtime.getRuntime().exec(isRooted ? AppUtils.getSuAlias() : "sh");
             os = new DataOutputStream(process.getOutputStream());
             for (String command : commands) {
                 if (command == null) continue;

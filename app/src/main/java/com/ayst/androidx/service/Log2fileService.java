@@ -241,7 +241,7 @@ public class Log2fileService extends Service {
             DataOutputStream dos = null;
 
             try {
-                Process process = Runtime.getRuntime().exec("su");
+                Process process = Runtime.getRuntime().exec(AppUtils.getSuAlias());
                 dos = new DataOutputStream(process.getOutputStream());
 
                 String command = "dmesg\n";

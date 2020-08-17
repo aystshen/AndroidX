@@ -66,8 +66,12 @@ public class AppUtils {
     // Storage
     private static String sRootDir = "";
 
+    // su 别名
+    private static String sSuAlias = "";
+
     /**
      * Is first run
+     *
      * @param context
      * @return
      */
@@ -82,6 +86,7 @@ public class AppUtils {
 
     /**
      * Get application version name
+     *
      * @param context Context
      * @return version name
      */
@@ -101,6 +106,7 @@ public class AppUtils {
 
     /**
      * Get application version code
+     *
      * @param context Context
      * @return version code
      */
@@ -120,6 +126,7 @@ public class AppUtils {
 
     /**
      * Get product name
+     *
      * @return product name
      */
     public static String getProductName() {
@@ -131,6 +138,7 @@ public class AppUtils {
 
     /**
      * Get chip platform
+     *
      * @return platform
      */
     public static String getPlatform() {
@@ -142,6 +150,7 @@ public class AppUtils {
 
     /**
      * Get product id
+     *
      * @return product id
      */
     public static String getProductId() {
@@ -153,6 +162,7 @@ public class AppUtils {
 
     /**
      * Get hardware version code
+     *
      * @return version code
      */
     public static int getHwVersionCode() {
@@ -172,6 +182,7 @@ public class AppUtils {
 
     /**
      * Get hardware version name
+     *
      * @return version name
      */
     public static String getHwVersionName() {
@@ -183,6 +194,7 @@ public class AppUtils {
 
     /**
      * Get firmware version code
+     *
      * @return version code
      */
     public static int getSwVersionCode() {
@@ -195,6 +207,7 @@ public class AppUtils {
 
     /**
      * Get firmware version name
+     *
      * @return version name
      */
     public static String getSwVersionName() {
@@ -206,6 +219,7 @@ public class AppUtils {
 
     /**
      * Get Android version
+     *
      * @return version
      */
     public static String getAndroidVersion() {
@@ -214,6 +228,7 @@ public class AppUtils {
 
     /**
      * Get serial number
+     *
      * @return serial number
      */
     @SuppressLint("HardwareIds")
@@ -231,6 +246,7 @@ public class AppUtils {
 
     /**
      * Get device id
+     *
      * @return device id
      */
     public static String getDeviceId() {
@@ -239,6 +255,7 @@ public class AppUtils {
 
     /**
      * Get current country
+     *
      * @return country
      */
     public static String getCountry() {
@@ -247,6 +264,7 @@ public class AppUtils {
 
     /**
      * Get current language
+     *
      * @return language
      */
     public static String getLanguage() {
@@ -255,6 +273,7 @@ public class AppUtils {
 
     /**
      * Whether the network is connected
+     *
      * @param context Context
      * @return true/false
      */
@@ -267,6 +286,7 @@ public class AppUtils {
 
     /**
      * Whether WiFi is connected
+     *
      * @param context Context
      * @return true/false
      */
@@ -279,6 +299,7 @@ public class AppUtils {
 
     /**
      * Get Ethernet MAC
+     *
      * @param context
      * @return
      */
@@ -305,6 +326,7 @@ public class AppUtils {
 
     /**
      * Get WiFi MAC
+     *
      * @param context
      * @return
      */
@@ -321,6 +343,7 @@ public class AppUtils {
 
     /**
      * Get MAC, get the Ethernet MAC first, then get the WiFi MAC if it is empty.
+     *
      * @param context
      * @return
      */
@@ -336,6 +359,7 @@ public class AppUtils {
 
     /**
      * Get the MAC with the colon removed
+     *
      * @param context
      * @return
      */
@@ -351,6 +375,7 @@ public class AppUtils {
 
     /**
      * Get screen width
+     *
      * @param context Activity
      * @return screen width
      */
@@ -363,6 +388,7 @@ public class AppUtils {
 
     /**
      * Get screen height
+     *
      * @param context Activity
      * @return screen height
      */
@@ -379,6 +405,7 @@ public class AppUtils {
 
     /**
      * Get the root storage path
+     *
      * @param context Context
      * @return path
      */
@@ -412,6 +439,7 @@ public class AppUtils {
 
     /**
      * Get relative storage path
+     *
      * @param context Context
      * @param dirName relative path
      * @return full path
@@ -428,7 +456,8 @@ public class AppUtils {
 
     /**
      * Get property
-     * @param key property key
+     *
+     * @param key          property key
      * @param defaultValue default value
      * @return property value
      */
@@ -448,7 +477,8 @@ public class AppUtils {
 
     /**
      * Set property
-     * @param key property key
+     *
+     * @param key   property key
      * @param value property value
      */
     @SuppressLint("PrivateApi")
@@ -464,6 +494,7 @@ public class AppUtils {
 
     /**
      * Get UUID
+     *
      * @return UUID
      */
     public static String getUUID() {
@@ -534,5 +565,17 @@ public class AppUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * 获取su命令别名（个别项目会重命名su）
+     *
+     * @return su别名
+     */
+    public static String getSuAlias() {
+        if (TextUtils.isEmpty(sSuAlias)) {
+            sSuAlias = AppUtils.getProperty("ro.su_alias", "su");
+        }
+        return sSuAlias;
     }
 }
