@@ -72,6 +72,11 @@ public class OtgService extends Service {
 
         @Override
         public boolean setOtgMode(String mode) throws RemoteException {
+            return setOtgModeExt(mode, true);
+        }
+
+        @Override
+        public boolean setOtgModeExt(String mode, boolean save) throws RemoteException {
             boolean success = false;
             if (null != mCurOtg) {
                 ShellUtils.CommandResult result;
@@ -86,7 +91,10 @@ public class OtgService extends Service {
 
                 success = result.errorMsg.isEmpty();
                 if (success) {
-                    AppUtils.setProperty("persist.sys.otg_mode", mode);
+                    if (save) {
+                        Log.i(TAG, "setOtgMode, save");
+                        AppUtils.setProperty("persist.sys.otg_mode", mode);
+                    }
                     if (TextUtils.equals(USB_MODE_HOST, mode)) {
                         if (TextUtils.equals("1", AppUtils.getProperty(
                                 "ro.androidx.watchdog", "0"))) {
