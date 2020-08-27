@@ -237,20 +237,30 @@ public class Log2fileService extends Service {
         public void run() {
             Log.i(TAG, "Kmsg -> file run...");
 
+            boolean isRoot = true;
             FileOutputStream fos = null;
             DataOutputStream dos = null;
 
             try {
-                Process process = Runtime.getRuntime().exec(AppUtils.getSuAlias());
+                Process process;
+                try {
+                    process = Runtime.getRuntime().exec(AppUtils.getSuAlias());
+                } catch (Exception e) {
+                    Log.w(TAG, "mKmsg2fileRunnable, Root exception, running in non-root environment.");
+                    process = Runtime.getRuntime().exec("sh");
+                    isRoot = false;
+                }
                 dos = new DataOutputStream(process.getOutputStream());
 
                 String command = "dmesg\n";
                 dos.write(command.getBytes(Charset.forName("utf-8")));
                 dos.flush();
 
-                command = "cat proc/kmsg\n";
-                dos.write(command.getBytes(Charset.forName("utf-8")));
-                dos.flush();
+                if (isRoot) {
+                    command = "cat proc/kmsg\n";
+                    dos.write(command.getBytes(Charset.forName("utf-8")));
+                    dos.flush();
+                }
 
                 BufferedReader bufferedReader = new BufferedReader(
                         new InputStreamReader(process.getInputStream()));
