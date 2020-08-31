@@ -10,6 +10,7 @@ public class SPUtils {
 
     public static final String KEY_4G_KEEP_LIVE = "4g_keep_live";
     public static final String KEY_LOG2FILE = "log2file";
+    public static final String KEY_LOG2FILE_NUM = "log2file_num";
     public static final String KEY_KEY_INTERCEPT = "key_intercept";
 
     private static SPUtils instance;

@@ -7,4 +7,6 @@ interface ILog2fileService {
     void openLog2file();
     void closeLog2file();
     boolean isOpen();
+    boolean setLogFileNum(int num);
+    int getLogFileNum();
 }

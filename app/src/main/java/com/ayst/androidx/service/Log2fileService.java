@@ -25,10 +25,11 @@ import java.util.Locale;
 public class Log2fileService extends Service {
     private static final String TAG = "Log2fileService";
 
-    private static final long FILE_MAX_SIZE = 20*1024*1024;
-    private static final long FILE_MAX_NUMBER = 10;
+    private static final long FILE_MAX_SIZE = 20 * 1024 * 1024;
+    private static final long FILE_MAX_NUM = 1000;
 
     private boolean mAlive = false;
+    private int mLogFileMaxNum = 10;
     private Thread mLog2fileThread;
     private Thread mKmsg2fileThread;
 
@@ -85,6 +86,38 @@ public class Log2fileService extends Service {
         public boolean isOpen() throws RemoteException {
             return Log2fileService.this.isOpen();
         }
+
+        /**
+         * 设置最大日志文件数量
+         *
+         * @param num 文件数量
+         * @return true: 成功， false: 失败
+         * @throws RemoteException
+         */
+        @Override
+        public boolean setLogFileNum(int num) throws RemoteException {
+            if (num > 0 && num <= FILE_MAX_NUM) {
+                Log.i(TAG, "setLogFileNum, num=" + num);
+                mLogFileMaxNum = num;
+                SPUtils.get(Log2fileService.this).saveData(
+                        SPUtils.KEY_LOG2FILE_NUM, num);
+                return true;
+            } else {
+                Log.e(TAG, "setLogFileNum, Invalid value: " + num);
+                return false;
+            }
+        }
+
+        /**
+         * 获取最大日志文件数量
+         *
+         * @return 文件数量
+         * @throws RemoteException
+         */
+        @Override
+        public int getLogFileNum() throws RemoteException {
+            return mLogFileMaxNum;
+        }
     };
 
     @Override
@@ -99,6 +132,8 @@ public class Log2fileService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand...");
 
+        mLogFileMaxNum = SPUtils.get(this).getData(
+                SPUtils.KEY_LOG2FILE_NUM, mLogFileMaxNum);
         if (isOpen()) {
             start();
         } else {
@@ -143,7 +178,7 @@ public class Log2fileService extends Service {
 
     /**
      * 创建Logcat日志文件
-     * 最多保存{@link FILE_MAX_NUMBER} 个日志文件，超出后删除历史文件
+     * 最多保存{@link mLogFileMaxNum} 个日志文件，超出后删除历史文件
      * 路径：sdcard/com.ayst.androidx/log/android/年-月-日.log
      *
      * @return 日志文件
@@ -152,7 +187,7 @@ public class Log2fileService extends Service {
         File logcatDir = new File(sLogcatDir);
         File[] logcatFiles = logcatDir.listFiles();
         Arrays.sort(logcatFiles);
-        for (int i = 0; i <= logcatFiles.length - FILE_MAX_NUMBER; i++) {
+        for (int i = 0; i <= logcatFiles.length - mLogFileMaxNum; i++) {
             logcatFiles[i].delete();
         }
 
@@ -162,7 +197,7 @@ public class Log2fileService extends Service {
 
     /**
      * 创建Kernel日志文件
-     * 最多保存{@link FILE_MAX_NUMBER} 个日志文件，超出后删除历史文件
+     * 最多保存{@link mLogFileMaxNum} 个日志文件，超出后删除历史文件
      * 路径：sdcard/com.ayst.androidx/log/kernel/年-月-日.log
      *
      * @return 日志文件
@@ -171,7 +206,7 @@ public class Log2fileService extends Service {
         File kmsgDir = new File(sKmsgDir);
         File[] kmsgFiles = kmsgDir.listFiles();
         Arrays.sort(kmsgFiles);
-        for (int i = 0; i <= kmsgFiles.length - FILE_MAX_NUMBER; i++) {
+        for (int i = 0; i <= kmsgFiles.length - mLogFileMaxNum; i++) {
             kmsgFiles[i].delete();
         }
 
