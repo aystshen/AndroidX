@@ -14,6 +14,18 @@
     <uses-permission android:name="com.ayst.androidx.permission.SELF_BROADCAST" />
     <uses-permission android:name="android.permission.CHANGE_COMPONENT_ENABLED_STATE" />
 
+    <!--定时开关机相关权限-->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW" />
+    <uses-permission android:name="android.permission.REBOOT" />
+    <uses-permission android:name="android.intent.action.ACTION_SHUTDOWN" />
+    <uses-permission android:name="android.permission.SHUTDOWN" />
+    <uses-permission android:name="com.android.internal.intent.action.REQUEST_SHUTDOWN" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -93,6 +105,20 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <!--响应服务-->
+        <service
+            android:name=".start_stop_schedule_core.service.ResponseService"
+            android:enabled="true"
+            android:exported="true" />
+        <!--远程连接服务-->
+        <service
+            android:name=".start_stop_schedule_core.service.SupplyService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.ayst.androidx.TIMERTC_SREVICE" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

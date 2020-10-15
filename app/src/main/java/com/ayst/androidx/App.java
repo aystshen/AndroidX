@@ -1,9 +1,11 @@
 package com.ayst.androidx;
 
 import android.app.Application;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.ayst.androidx.start_stop_schedule_core.manager.ScheduleManager;
 import com.ayst.androidx.supply.Mcu;
 import com.ayst.androidx.util.AppUtils;
 import com.ayst.androidx.util.SPUtils;
@@ -12,10 +14,13 @@ public class App extends Application {
     private static final String TAG = "App";
 
     private Mcu mMcu;
+    private static App sInstance;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        sInstance = this;
 
         Log.i(TAG, "AndroidX, version: " + AppUtils.getVersionName(this));
 
@@ -27,6 +32,33 @@ public class App extends Application {
         if (AppUtils.isFirstRun(this)) {
             loadDefaultConfig();
         }
+
+        //启动定时开关机服务
+        int toRtc = ScheduleManager.get().updateTimeToRtc();
+        Log.e("SupplyApplication", "toRtc:" + toRtc);
+    }
+
+    /**
+     * 获取全局上下文
+     *
+     * @return
+     */
+    public static App get() {
+        return sInstance;
+    }
+
+
+    /**
+     * 定时开机
+     *
+     * @param time
+     * @return
+     */
+    public int setUptime(int time) {
+        if (mMcu != null) {
+            return mMcu.setUptime(time);
+        }
+        return -1;
     }
 
     private void loadDefaultConfig() {
