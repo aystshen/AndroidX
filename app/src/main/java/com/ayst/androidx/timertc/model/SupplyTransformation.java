@@ -1,11 +1,11 @@
-package com.ayst.androidx.start_stop_schedule_core.model;
+package com.ayst.androidx.timertc.model;
 
 
 import android.util.Log;
 
-import com.ayst.androidx.start_stop_schedule_core.utils.ParseUtils;
+import com.ayst.androidx.timertc.utils.ParseUtils;
 
-import static com.ayst.androidx.start_stop_schedule_core.ScheduleConfig.SCHEDU_TAG;
+
 
 /**
  * 请求参数解析
@@ -33,7 +33,7 @@ public class SupplyTransformation implements ITransformation {
     public SupplyParam transform(String params) {
         SupplyParam supplyParam = ParseUtils.parse(params);
 
-        Log.e(SCHEDU_TAG, "supplyParam:" + supplyParam);
+        Log.e(TAG, "supplyParam:" + supplyParam);
 
         if (supplyParam != null) {
             int checkResult = mChecker.check(supplyParam);

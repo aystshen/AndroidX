@@ -9,6 +9,7 @@ import com.ayst.androidx.service.AppEnableService;
 import com.ayst.androidx.service.Log2fileService;
 import com.ayst.androidx.service.ModemService;
 import com.ayst.androidx.service.OtgService;
+import com.ayst.androidx.service.TimeRTCService;
 import com.ayst.androidx.service.WatchdogService;
 import com.ayst.androidx.util.AppUtils;
 import com.ayst.androidx.util.SPUtils;
@@ -20,12 +21,15 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.d(TAG, "onReceive, action = " + action);
+
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
+            Log.i(TAG, "开机自启");
             context.startService(new Intent(context, AppEnableService.class));
             context.startService(new Intent(context, Log2fileService.class));
             context.startService(new Intent(context, ModemService.class));
             context.startService(new Intent(context, WatchdogService.class));
             context.startService(new Intent(context, OtgService.class));
+            context.startService(new Intent(context, TimeRTCService.class));
 
             if (SPUtils.get(context).getData(SPUtils.KEY_KEY_INTERCEPT, false)) {
                 AppUtils.openAccessibilityService(context);

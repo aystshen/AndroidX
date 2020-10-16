@@ -107,12 +107,12 @@
         </receiver>
         <!--响应服务-->
         <service
-            android:name=".start_stop_schedule_core.service.ResponseService"
+            android:name=".timertc.service.ResponseService"
             android:enabled="true"
             android:exported="true" />
         <!--远程连接服务-->
         <service
-            android:name=".start_stop_schedule_core.service.SupplyService"
+            android:name=".service.TimeRTCService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

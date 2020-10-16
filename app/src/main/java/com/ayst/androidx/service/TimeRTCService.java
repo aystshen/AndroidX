@@ -1,4 +1,4 @@
-package com.ayst.androidx.start_stop_schedule_core.service;
+package com.ayst.androidx.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,25 +7,33 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.ayst.androidx.ITimeRTCService;
-import com.ayst.androidx.start_stop_schedule_core.manager.ScheduleManager;
+import com.ayst.androidx.timertc.manager.ScheduleManager;
 
 
 /**
  * 提供与外部应用通信的AIDL服务
  */
-public class SupplyService extends Service {
+public class TimeRTCService extends Service {
 
-    private static final String TAG = "SupplyService";
+    private static final String TAG = TimeRTCService.class.getSimpleName();
 
-    public SupplyService() {
+    public TimeRTCService() {
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e(TAG, "客户端来连接");
+        Log.e(TAG, "客户端连接");
         return new SupplyBinder();
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.e(TAG, "TimeRTCService-->服务启动");
+        //启动定时开关机服务
+        int toRtc = ScheduleManager.get().updateTimeToRtc();
+        Log.e(TAG, "toRtc:" + toRtc);
+        return Service.START_REDELIVER_INTENT;//重启
+    }
 
     private static class SupplyBinder extends ITimeRTCService.Stub {
 

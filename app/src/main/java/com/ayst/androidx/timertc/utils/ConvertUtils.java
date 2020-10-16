@@ -1,15 +1,13 @@
-package com.ayst.androidx.start_stop_schedule_core.utils;
+package com.ayst.androidx.timertc.utils;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.ayst.androidx.start_stop_schedule_core.ScheduleConfig;
+import com.ayst.androidx.timertc.ScheduleConfig;
 
 
 import java.text.ParseException;
-
-import static com.ayst.androidx.start_stop_schedule_core.ScheduleConfig.SCHEDU_TAG;
 
 
 public class ConvertUtils {

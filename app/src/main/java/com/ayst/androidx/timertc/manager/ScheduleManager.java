@@ -1,4 +1,4 @@
-package com.ayst.androidx.start_stop_schedule_core.manager;
+package com.ayst.androidx.timertc.manager;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -8,16 +8,16 @@ import android.os.Build;
 import android.util.Log;
 
 import com.ayst.androidx.App;
-import com.ayst.androidx.start_stop_schedule_core.ScheduleConfig;
-import com.ayst.androidx.start_stop_schedule_core.model.DataSource;
-import com.ayst.androidx.start_stop_schedule_core.model.ITransformation;
-import com.ayst.androidx.start_stop_schedule_core.model.SupplyParam;
-import com.ayst.androidx.start_stop_schedule_core.model.SupplyResult;
-import com.ayst.androidx.start_stop_schedule_core.model.SupplyTransformation;
-import com.ayst.androidx.start_stop_schedule_core.service.ResponseService;
+import com.ayst.androidx.timertc.ScheduleConfig;
+import com.ayst.androidx.timertc.model.DataSource;
+import com.ayst.androidx.timertc.model.ITransformation;
+import com.ayst.androidx.timertc.model.SupplyParam;
+import com.ayst.androidx.timertc.model.SupplyResult;
+import com.ayst.androidx.timertc.model.SupplyTransformation;
+import com.ayst.androidx.timertc.service.ResponseService;
 import com.google.gson.Gson;
 
-import static com.ayst.androidx.start_stop_schedule_core.ScheduleConfig.SCHEDU_TAG;
+
 
 /**
  * 定时器管理器
@@ -63,7 +63,6 @@ public class ScheduleManager {
         SupplyParam supplyParam = mTransformation.transform(params);
 
         if (supplyParam == null) { //设置错误，表示该任务设置失败
-
             return ScheduleConfig.RESULT_CODE_OTHER_ERROR;
         }
 
@@ -115,10 +114,10 @@ public class ScheduleManager {
      */
     private void startAlarmManager(SupplyParam supplyParam) {
         if (supplyParam == null) {
-            Log.e(SCHEDU_TAG, "开启任务：SupplyParam is null");
+            Log.e(TAG, "开启任务：SupplyParam is null");
             return;
         }
-        Log.e(SCHEDU_TAG, "triggerPoint " + supplyParam.getShutTime());
+        Log.e(TAG, "triggerPoint " + supplyParam.getShutTime());
         AlarmManager am = (AlarmManager) App.get().getSystemService(Context.ALARM_SERVICE);
         if (am != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -128,14 +127,14 @@ public class ScheduleManager {
             } else {
                 am.set(AlarmManager.RTC_WAKEUP, supplyParam.getShutTime(), createIntent(supplyParam));
             }
-            Log.e(SCHEDU_TAG, "开启任务成功");
+            Log.e(TAG, "开启任务成功");
         }
     }
 
     private void cancelAlarmManager(SupplyParam supplyParam) {
-        Log.e(SCHEDU_TAG, "取消任务操作：" + supplyParam);
+        Log.e(TAG, "取消任务操作：" + supplyParam);
         if (supplyParam == null) {
-            Log.e(SCHEDU_TAG, "取消任务操作：SupplyParam is null");
+            Log.e(TAG, "取消任务操作：SupplyParam is null");
         } else {
             AlarmManager am = (AlarmManager) App.get().getSystemService(Context.ALARM_SERVICE);
             PendingIntent pi = createIntent(supplyParam);
@@ -143,7 +142,7 @@ public class ScheduleManager {
                 am.cancel(pi);
             }
             pi.cancel();
-            Log.e(SCHEDU_TAG, "取消任务成功");
+            Log.e(TAG, "取消任务成功");
         }
     }
 

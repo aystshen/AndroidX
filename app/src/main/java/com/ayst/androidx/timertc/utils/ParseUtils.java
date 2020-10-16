@@ -1,12 +1,12 @@
-package com.ayst.androidx.start_stop_schedule_core.utils;
+package com.ayst.androidx.timertc.utils;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
 
-import com.ayst.androidx.start_stop_schedule_core.ScheduleConfig;
-import com.ayst.androidx.start_stop_schedule_core.model.SupplyParam;
+import com.ayst.androidx.timertc.ScheduleConfig;
+import com.ayst.androidx.timertc.model.SupplyParam;
 
 import org.json.JSONException;
 import org.json.JSONObject;

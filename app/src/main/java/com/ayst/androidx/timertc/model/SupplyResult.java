@@ -1,4 +1,4 @@
-package com.ayst.androidx.start_stop_schedule_core.model;
+package com.ayst.androidx.timertc.model;
 
 
 /**

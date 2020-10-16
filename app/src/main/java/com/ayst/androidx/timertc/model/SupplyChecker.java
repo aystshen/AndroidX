@@ -1,20 +1,21 @@
-package com.ayst.androidx.start_stop_schedule_core.model;
+package com.ayst.androidx.timertc.model;
 
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.ayst.androidx.start_stop_schedule_core.ScheduleConfig;
+import com.ayst.androidx.timertc.ScheduleConfig;
+
 
 
 import java.util.concurrent.TimeUnit;
 
-import static com.ayst.androidx.start_stop_schedule_core.ScheduleConfig.SCHEDU_TAG;
+
 
 /**
  * 请求数据检查
  */
 public class SupplyChecker implements IChecker<SupplyParam> {
-
+    private static final String TAG = SupplyChecker.class.getSimpleName();
 
     @Override
     public int check(SupplyParam data) {
@@ -28,7 +29,7 @@ public class SupplyChecker implements IChecker<SupplyParam> {
     }
 
     private int checkCancel(SupplyParam data) {
-        Log.i(SCHEDU_TAG, "checkCancel：" + data);
+        Log.i(TAG, "checkCancel：" + data);
         return ScheduleConfig.RESULT_CODE_SUCCESS;
     }
 
@@ -68,25 +69,28 @@ public class SupplyChecker implements IChecker<SupplyParam> {
             return ScheduleConfig.RESULT_CODE_DATA_TIME_ERROR;
         }
 
-        Log.i("SupplyChecker", "data.getShutTime():" + data.getShutTime());
-        Log.i("SupplyChecker", "System.currentTimeMillis():" + System.currentTimeMillis());
-        Log.i("SupplyChecker", "data.getShutTime() - System.currentTimeMillis():" + (data.getShutTime() - System.currentTimeMillis()));
-        Log.i("SupplyChecker", "AppConfig.MINUTE_5_MILLIS:" + ScheduleConfig.MINUTE_5_MILLIS);
-        Log.i("SupplyChecker", "AppConfig.MINUTE_4_MILLIS:" + TimeUnit.MINUTES.toMillis(4));
+        Log.i(TAG, "data.getShutTime():" + data.getShutTime());
+        Log.i(TAG, "System.currentTimeMillis():" + System.currentTimeMillis());
+        Log.i(TAG, "多少毫秒后关机:" + (data.getShutTime() - System.currentTimeMillis()));
+        Log.i(TAG, "ScheduleConfig.MINUTE_5_MILLIS:" + ScheduleConfig.MINUTE_5_MILLIS);
+        Log.i(TAG, "ScheduleConfig.MINUTE_4_MILLIS:" + TimeUnit.MINUTES.toMillis(4));
 
         // 设置的时间小于当前时间
         if (System.currentTimeMillis() > data.getShutTime()) {
+            Log.e(TAG, "设置的时间小于当前时间");
             return ScheduleConfig.RESULT_CODE_LESS;
         }
-        // TODO 毫秒数(精确度在4-5之间)
+//        // TODO 毫秒数(精确度在4-5之间)  调式时关掉
         if (data.getShutTime() - System.currentTimeMillis() < ScheduleConfig.MINUTE_5_MILLIS) { // 关机时间至少要比当前时间推迟5分钟
+            Log.e(TAG, "关机时间至少要比当前时间推迟5分钟");
             return ScheduleConfig.RESULT_CODE_TIME_INTERVAL_ERROR;
         }
 
         if (data.getBootTime() - data.getShutTime() < ScheduleConfig.MINUTE_5_MILLIS) { // 开机时间与关机时间间隔小于5分钟
+            Log.e(TAG, "开机时间与关机时间间隔小于5分钟");
             return ScheduleConfig.RESULT_CODE_TIME_INTERVAL_ERROR;
         }
-
+        Log.e(TAG, "设置成功");
         return ScheduleConfig.RESULT_CODE_SUCCESS;
     }
 

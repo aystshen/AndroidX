@@ -1,4 +1,4 @@
-package com.ayst.androidx.start_stop_schedule_core.service;
+package com.ayst.androidx.timertc.service;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -6,11 +6,10 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ayst.androidx.App;
-import com.ayst.androidx.start_stop_schedule_core.model.DataSource;
-import com.ayst.androidx.start_stop_schedule_core.model.SupplyParam;
-import com.ayst.androidx.start_stop_schedule_core.utils.ParseUtils;
+import com.ayst.androidx.timertc.model.DataSource;
+import com.ayst.androidx.timertc.model.SupplyParam;
+import com.ayst.androidx.timertc.utils.ParseUtils;
 
-import static com.ayst.androidx.start_stop_schedule_core.ScheduleConfig.SCHEDU_TAG;
 
 /**
  * 响应服务
@@ -37,12 +36,12 @@ public class ResponseService extends IntentService {
         SupplyParam supplyParam = ParseUtils.parse(params);
         if (supplyParam != null) {
             long interval = supplyParam.getBootTime() - supplyParam.getShutTime();
-            Log.e(SCHEDU_TAG, "interval: " + interval);
+            Log.e(TAG, "interval: " + interval);
             if (interval < 1) {
-                Log.e(SCHEDU_TAG, "calculateNextPowerOn: 时间间隔过小");
+                Log.e(TAG, "calculateNextPowerOn: 时间间隔过小");
             } else {
                 int state = App.get().setUptime((int) interval / 1000);
-                Log.e(SCHEDU_TAG, "setUptime():" + state);
+                Log.e(TAG, "setUptime():" + state);
                 if (state >= 0) {
                     shutdown(); // 关机
                 }

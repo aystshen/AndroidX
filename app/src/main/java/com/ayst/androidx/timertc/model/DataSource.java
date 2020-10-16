@@ -1,8 +1,8 @@
-package com.ayst.androidx.start_stop_schedule_core.model;
+package com.ayst.androidx.timertc.model;
 
 
 import com.ayst.androidx.App;
-import com.ayst.androidx.start_stop_schedule_core.ScheduleConfig;
+import com.ayst.androidx.timertc.ScheduleConfig;
 import com.ayst.androidx.util.SPUtils;
 
 /**

@@ -1,4 +1,4 @@
-package com.ayst.androidx.start_stop_schedule_core;
+package com.ayst.androidx.timertc;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ScheduleConfig {
 
-    public static final String SCHEDU_TAG = "schedu_tag";
+
 
     /**
      * 时间格式化
