@@ -10,6 +10,7 @@ import android.util.Log;
 import com.ayst.androidx.IWatchdogService;
 import com.ayst.androidx.event.MessageEvent;
 import com.ayst.androidx.supply.Mcu;
+import com.ayst.androidx.util.AppUtils;
 import com.ayst.androidx.util.FileUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -32,6 +33,7 @@ public class WatchdogService extends Service {
     private static final File WATCHDOG_FLAG_FILE = new File(RECOVERY_DIR + "/last_watchdog_flag");
 
     private boolean mAlive = true;
+    private boolean mHeartbeat = true;
     private int mTimeout;
     private Mcu mMcu;
     private Thread mHeartbeatThread;
@@ -56,8 +58,10 @@ public class WatchdogService extends Service {
             Log.i(TAG, "openWatchdog");
             if (!watchdogIsOpen()) {
                 if (mMcu.openWatchdog() == 0) {
-                    mHeartbeatThread = new Thread(mHeartbeatRunnable);
-                    mHeartbeatThread.start();
+                    if (mHeartbeat) {
+                        mHeartbeatThread = new Thread(mHeartbeatRunnable);
+                        mHeartbeatThread.start();
+                    }
                 } else {
                     Log.e(TAG, "openWatchdog, failed.");
                     return false;
@@ -115,11 +119,16 @@ public class WatchdogService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand...");
 
+        mHeartbeat = !TextUtils.equals("2", AppUtils.getProperty(
+                "ro.androidx.watchdog", "0"));
+
         EventBus.getDefault().register(this);
 
         if (mMcu.watchdogIsOpen()) {
-            mHeartbeatThread = new Thread(mHeartbeatRunnable);
-            mHeartbeatThread.start();
+            if (mHeartbeat) {
+                mHeartbeatThread = new Thread(mHeartbeatRunnable);
+                mHeartbeatThread.start();
+            }
         } else {
             Log.w(TAG, "onStartCommand, watchdog is off.");
             checkLastFlag();

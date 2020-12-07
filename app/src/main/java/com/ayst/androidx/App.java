@@ -59,7 +59,7 @@ public class App extends Application {
     private void loadDefaultConfig() {
         Log.i(TAG, "loadDefaultConfig");
 
-        boolean watchdog = TextUtils.equals("1", AppUtils.getProperty("ro.androidx.watchdog", "0"));
+        boolean watchdog = !TextUtils.equals("0", AppUtils.getProperty("ro.androidx.watchdog", "0"));
         boolean keepLive4g = TextUtils.equals("1", AppUtils.getProperty("ro.androidx.4g_keep_live", "0"));
         boolean log2file = TextUtils.equals("1", AppUtils.getProperty("ro.androidx.log2file", "1"));
         boolean keyIntercept = TextUtils.equals("1", AppUtils.getProperty("ro.androidx.key_intercept", "0"));
