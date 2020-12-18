@@ -82,10 +82,10 @@ public class OtgService extends Service {
                 ShellUtils.CommandResult result;
                 if (mCurOtgType == OTG_TYPE_USB3
                     && TextUtils.equals(USB_MODE_HOST, mode)) {
-                    ShellUtils.execCmd("echo " + mCurOtg.getMode(USB_MODE_AUTO) + " > " + mCurOtg.file, true);
+                    ShellUtils.execCmd("echo " + mCurOtg.getMode(USB_MODE_AUTO) + " > " + mCurOtg.file, false);
                 }
                 result = ShellUtils.execCmd(
-                        "echo " + mCurOtg.getMode(mode) + " > " + mCurOtg.file, true);
+                        "echo " + mCurOtg.getMode(mode) + " > " + mCurOtg.file, false);
 
                 Log.i(TAG, "setOtgMode, result: " + result);
 
@@ -116,7 +116,7 @@ public class OtgService extends Service {
         public String getOtgMode() throws RemoteException {
             if (null != mCurOtg) {
                 ShellUtils.CommandResult result = ShellUtils.execCmd(
-                        "cat " + mCurOtg.file, true);
+                        "cat " + mCurOtg.file, false);
 
                 Log.i(TAG, "getOtgMode, result: " + result);
 
