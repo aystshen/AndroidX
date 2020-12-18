@@ -96,7 +96,7 @@ public class OtgService extends Service {
                         AppUtils.setProperty("persist.sys.otg_mode", mode);
                     }
                     if (TextUtils.equals(USB_MODE_HOST, mode)) {
-                        if (!TextUtils.equals("0", AppUtils.getProperty(
+                        if (TextUtils.equals("1", AppUtils.getProperty(
                                 "ro.androidx.watchdog", "0"))) {
                             Log.i(TAG, "setOtgMode, [USB_MODE_HOST] Reopen the watchdog");
                             EventBus.getDefault().post(new MessageEvent(MessageEvent.MSG_OPEN_WATCHDOG));
