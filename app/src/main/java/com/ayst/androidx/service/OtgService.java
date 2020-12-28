@@ -14,7 +14,6 @@ import com.ayst.androidx.util.ShellUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,13 +94,7 @@ public class OtgService extends Service {
                         Log.i(TAG, "setOtgMode, save");
                         AppUtils.setProperty("persist.sys.otg_mode", mode);
                     }
-                    if (TextUtils.equals(USB_MODE_HOST, mode)) {
-                        if (TextUtils.equals("1", AppUtils.getProperty(
-                                "ro.androidx.watchdog", "0"))) {
-                            Log.i(TAG, "setOtgMode, [USB_MODE_HOST] Reopen the watchdog");
-                            EventBus.getDefault().post(new MessageEvent(MessageEvent.MSG_OPEN_WATCHDOG));
-                        }
-                    } else {
+                    if (!TextUtils.equals(USB_MODE_HOST, mode)) {
                         Log.i(TAG, "setOtgMode, [USB_MODE_DEVICE|USB_MODE_AUTO] Close the watchdog");
                         EventBus.getDefault().post(new MessageEvent(MessageEvent.MSG_CLOSE_WATCHDOG));
                     }

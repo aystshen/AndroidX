@@ -4,36 +4,28 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.IWatchdogService;
 import com.ayst.androidx.event.MessageEvent;
 import com.ayst.androidx.supply.Mcu;
 import com.ayst.androidx.util.AppUtils;
-import com.ayst.androidx.util.FileUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
-import java.io.IOException;
-
 public class WatchdogService extends Service {
-
     private static final String TAG = "WatchdogService";
 
     private static final int TIMEOUT_MIN = 60;
 
-    /**
-     * Recovery upgrade status storage file
-     */
-    private static final String RECOVERY_DIR = "/cache/recovery";
-    private static final File WATCHDOG_FLAG_FILE = new File(RECOVERY_DIR + "/last_watchdog_flag");
+    private static final int STATE_OFF = 0;
+    private static final int STATE_ON = 1;
+    private static final int STATE_NONE = 2;
+    private int mState = STATE_NONE;
 
     private boolean mAlive = true;
-    private boolean mHeartbeat = true;
     private int mTimeout;
     private Mcu mMcu;
     private Thread mHeartbeatThread;
@@ -53,40 +45,45 @@ public class WatchdogService extends Service {
     }
 
     private final IWatchdogService.Stub mService = new IWatchdogService.Stub() {
+        /**
+         * 打开看门狗
+         *
+         * @return true:成功 false:失败
+         * @throws RemoteException
+         */
         @Override
         public boolean openWatchdog() throws RemoteException {
-            Log.i(TAG, "openWatchdog");
-            if (!watchdogIsOpen()) {
-                if (mMcu.openWatchdog() == 0) {
-                    if (mHeartbeat) {
-                        mHeartbeatThread = new Thread(mHeartbeatRunnable);
-                        mHeartbeatThread.start();
-                    }
-                } else {
-                    Log.e(TAG, "openWatchdog, failed.");
-                    return false;
-                }
+            if (WatchdogService.this.openWatchdog()) {
+                AppUtils.setProperty("persist.androidx.watchdog",
+                        String.valueOf(STATE_ON));
+                return true;
             }
-            return true;
+            return false;
         }
 
+        /**
+         * 关闭看门狗
+         *
+         * @return true:成功 false:失败
+         * @throws RemoteException
+         */
         @Override
         public boolean closeWatchdog() throws RemoteException {
-            Log.i(TAG, "closeWatchdog");
-            if (watchdogIsOpen()) {
-                if (mMcu.closeWatchdog() == 0) {
-                    mAlive = false;
-                    if (null != mHeartbeatThread) {
-                        mHeartbeatThread.interrupt();
-                    }
-                } else {
-                    Log.e(TAG, "closeWatchdog, failed.");
-                    return false;
-                }
+            if (WatchdogService.this.closeWatchdog()) {
+                AppUtils.setProperty("persist.androidx.watchdog",
+                        String.valueOf(STATE_OFF));
+                return true;
             }
-            return true;
+            return false;
         }
 
+        /**
+         * 设置看门狗超时时间
+         *
+         * @param timeout 超时时间
+         * @return true:成功 false:失败
+         * @throws RemoteException
+         */
         @Override
         public boolean setWatchdogTimeout(int timeout) throws RemoteException {
             Log.i(TAG, "setWatchdogTimeout, timeout=" + timeout);
@@ -98,17 +95,30 @@ public class WatchdogService extends Service {
                     return false;
                 }
             } else {
-                Log.e(TAG, "setWatchdogTimeout, the timeout must be greater than " + TIMEOUT_MIN + "s.");
+                Log.e(TAG, "setWatchdogTimeout, the timeout must be greater than "
+                        + TIMEOUT_MIN + "s.");
                 return false;
             }
             return true;
         }
 
+        /**
+         * 获取看门狗超时时间
+         *
+         * @return 超时时间
+         * @throws RemoteException
+         */
         @Override
         public int getWatchdogTimeout() throws RemoteException {
             return mMcu.getWatchdogDuration();
         }
 
+        /**
+         * 判断看门狗是否打开
+         *
+         * @return true:打开 false:关闭
+         * @throws RemoteException
+         */
         @Override
         public boolean watchdogIsOpen() throws RemoteException {
             return mMcu.watchdogIsOpen();
@@ -119,19 +129,18 @@ public class WatchdogService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand...");
 
-        mHeartbeat = !TextUtils.equals("2", AppUtils.getProperty(
-                "ro.androidx.watchdog", "0"));
-
         EventBus.getDefault().register(this);
 
-        if (mMcu.watchdogIsOpen()) {
-            if (mHeartbeat) {
-                mHeartbeatThread = new Thread(mHeartbeatRunnable);
-                mHeartbeatThread.start();
-            }
-        } else {
-            Log.w(TAG, "onStartCommand, watchdog is off.");
-            checkLastFlag();
+        mState = Integer.parseInt(AppUtils.getProperty("persist.androidx.watchdog",
+                String.valueOf(STATE_NONE)));
+        if (mState == STATE_ON) {
+            Log.d(TAG, "onStartCommand, watchdog is on.");
+            openWatchdog();
+        } else if (mState == STATE_OFF) {
+            Log.d(TAG, "onStartCommand, watchdog is off.");
+            closeWatchdog();
+        } else if (mState == STATE_NONE) {
+            Log.d(TAG, "onStartCommand, watchdog is none.");
         }
 
         return super.onStartCommand(intent, flags, startId);
@@ -147,51 +156,56 @@ public class WatchdogService extends Service {
     public void onMessageEvent(MessageEvent event) {
         switch (event.getMessage()) {
             case MessageEvent.MSG_OPEN_WATCHDOG:
-                try {
-                    mService.openWatchdog();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+                openWatchdog();
                 break;
             case MessageEvent.MSG_CLOSE_WATCHDOG:
-                try {
-                    mService.closeWatchdog();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+                closeWatchdog();
                 break;
-        }
-    };
-
-    private void checkLastFlag() {
-        String flag = null;
-        try {
-            flag = FileUtils.readFile(WATCHDOG_FLAG_FILE);
-        } catch (IOException e) {
-            Log.w(TAG, "checkLastFlag, " + e.getMessage());
-        }
-        Log.i(TAG, "checkLastFlag, flag = " + flag);
-
-        if (!TextUtils.isEmpty(flag)) {
-            String[] array = flag.split("\\$");
-            for (String param : array) {
-                if (param.startsWith("watchdog")) {
-                    String value = param.substring(param.indexOf('=') + 1);
-                    Log.i(TAG, "checkLastFlag, watchdog=" + value);
-
-                    if (TextUtils.equals("true", value)) {
-                        try {
-                            mService.openWatchdog();
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                WATCHDOG_FLAG_FILE.delete();
-            }
         }
     }
 
+    /**
+     * 打开看门狗
+     *
+     * @return true:成功 false:失败
+     */
+    private boolean openWatchdog() {
+        Log.i(TAG, "openWatchdog");
+        if (mMcu.openWatchdog() == 0) {
+            if (mHeartbeatThread == null) {
+                mHeartbeatThread = new Thread(mHeartbeatRunnable);
+                mHeartbeatThread.start();
+            }
+            return true;
+        } else {
+            Log.e(TAG, "openWatchdog, failed.");
+            return false;
+        }
+    }
+
+    /**
+     * 关闭看门狗
+     *
+     * @return true:成功 false:失败
+     */
+    private boolean closeWatchdog() {
+        Log.i(TAG, "closeWatchdog");
+        if (mMcu.closeWatchdog() == 0) {
+            mAlive = false;
+            if (mHeartbeatThread != null) {
+                mHeartbeatThread.interrupt();
+                mHeartbeatThread = null;
+            }
+            return true;
+        } else {
+            Log.e(TAG, "closeWatchdog, failed.");
+            return false;
+        }
+    }
+
+    /**
+     * 看门狗心跳线程
+     */
     private Runnable mHeartbeatRunnable = new Runnable() {
         @Override
         public void run() {
