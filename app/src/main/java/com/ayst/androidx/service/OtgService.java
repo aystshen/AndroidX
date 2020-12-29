@@ -92,7 +92,7 @@ public class OtgService extends Service {
                 if (success) {
                     if (save) {
                         Log.i(TAG, "setOtgMode, save");
-                        AppUtils.setProperty("persist.sys.otg_mode", mode);
+                        AppUtils.setProperty("persist.androidx.otg_mode", mode);
                     }
                     if (!TextUtils.equals(USB_MODE_HOST, mode)) {
                         Log.i(TAG, "setOtgMode, [USB_MODE_DEVICE|USB_MODE_AUTO] Close the watchdog");
@@ -126,7 +126,7 @@ public class OtgService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand...");
 
-        String mode = AppUtils.getProperty("persist.sys.otg_mode", "0");
+        String mode = AppUtils.getProperty("persist.androidx.otg_mode", "0");
         try {
             mService.setOtgMode(mode);
         } catch (RemoteException e) {

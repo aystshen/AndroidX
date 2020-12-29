@@ -6,14 +6,15 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.IModemService;
 import com.ayst.androidx.supply.Modem;
 import com.ayst.androidx.interfaces.OnNetworkStateChangedListener;
 import com.ayst.androidx.receiver.NetworkReceiver;
+import com.ayst.androidx.util.AppUtils;
 import com.ayst.androidx.util.NetworkUtils;
-import com.ayst.androidx.util.SPUtils;
 
 public class ModemService extends Service {
 
@@ -68,7 +69,7 @@ public class ModemService extends Service {
                 mKeepLiveThread = new Thread(mKeepLiveRunnable);
                 mKeepLiveThread.start();
 
-                SPUtils.get(ModemService.this).saveData(SPUtils.KEY_4G_KEEP_LIVE, true);
+                AppUtils.setProperty("persist.androidx.4g_keep_live", "1");
             }
             return true;
         }
@@ -82,7 +83,7 @@ public class ModemService extends Service {
                     mKeepLiveThread.interrupt();
                 }
 
-                SPUtils.get(ModemService.this).saveData(SPUtils.KEY_4G_KEEP_LIVE, false);
+                AppUtils.setProperty("persist.androidx.4g_keep_live", "0");
             }
             return true;
         }
@@ -108,7 +109,8 @@ public class ModemService extends Service {
     }
 
     private boolean keepLiveIsOpen() {
-        return SPUtils.get(this).getData(SPUtils.KEY_4G_KEEP_LIVE, false);
+        return TextUtils.equals("1", AppUtils.getProperty(
+                "persist.androidx.4g_keep_live", "0"));
     }
 
     private void registerNetworkReceiver() {

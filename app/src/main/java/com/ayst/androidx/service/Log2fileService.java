@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.ILog2fileService;
@@ -58,7 +59,7 @@ public class Log2fileService extends Service {
             Log.i(TAG, "openLog2file");
             if (!isOpen()) {
                 start();
-                SPUtils.get(Log2fileService.this).saveData(SPUtils.KEY_LOG2FILE, true);
+                AppUtils.setProperty("persist.androidx.log2file", "1");
             }
         }
 
@@ -72,7 +73,7 @@ public class Log2fileService extends Service {
             Log.i(TAG, "closeLog2file");
             if (isOpen()) {
                 stop();
-                SPUtils.get(Log2fileService.this).saveData(SPUtils.KEY_LOG2FILE, false);
+                AppUtils.setProperty("persist.androidx.log2file", "0");
             }
         }
 
@@ -149,7 +150,8 @@ public class Log2fileService extends Service {
      * @return
      */
     private boolean isOpen() {
-        return SPUtils.get(this).getData(SPUtils.KEY_LOG2FILE, false);
+        return TextUtils.equals("1", AppUtils.getProperty(
+                "persist.androidx.log2file", "1"));
     }
 
     /**

@@ -3,6 +3,7 @@ package com.ayst.androidx.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.service.AppEnableService;
@@ -31,7 +32,9 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             context.startService(new Intent(context, OtgService.class));
             context.startService(new Intent(context, TimeRTCService.class));
 
-            if (SPUtils.get(context).getData(SPUtils.KEY_KEY_INTERCEPT, false)) {
+            if (TextUtils.equals("1", AppUtils.getProperty(
+                    "persist.androidx.key_intercept",
+                    "0"))) {
                 AppUtils.openAccessibilityService(context);
             } else {
                 AppUtils.closeAccessibilityService(context);
