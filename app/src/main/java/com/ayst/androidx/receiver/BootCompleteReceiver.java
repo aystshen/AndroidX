@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.service.AppEnableService;
+import com.ayst.androidx.service.AppLaunchService;
 import com.ayst.androidx.service.Log2fileService;
 import com.ayst.androidx.service.ModemService;
 import com.ayst.androidx.service.OtgService;
@@ -25,6 +26,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
             Log.i(TAG, "开机自启");
+            context.startService(new Intent(context, AppLaunchService.class));
             context.startService(new Intent(context, AppEnableService.class));
             context.startService(new Intent(context, Log2fileService.class));
             context.startService(new Intent(context, ModemService.class));

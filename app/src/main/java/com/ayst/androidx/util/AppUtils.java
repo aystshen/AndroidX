@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -13,6 +14,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.accessibility.AccessibilityManager;
@@ -577,5 +579,21 @@ public class AppUtils {
             sSuAlias = AppUtils.getProperty("ro.su_alias", "su");
         }
         return sSuAlias;
+    }
+
+    /**
+     * 启动APP
+     *
+     * @param context     Context
+     * @param packageName PackageName
+     */
+    public static void startApp(@NonNull Context context, @NonNull String packageName) {
+        Intent intent = context.getPackageManager()
+                .getLaunchIntentForPackage(packageName);
+        if (intent != null) {
+            context.startActivity(intent);
+        } else {
+            Log.e(TAG, "startApp, Package does not exist.");
+        }
     }
 }

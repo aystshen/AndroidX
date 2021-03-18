@@ -40,6 +40,10 @@
             android:enabled="true"
             android:exported="true" />
         <service
+            android:name=".service.AppLaunchService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
             android:name=".service.KeyInterceptService"
             android:enabled="true"
             android:exported="true">
