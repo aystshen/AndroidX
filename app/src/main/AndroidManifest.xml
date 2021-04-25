@@ -84,6 +84,14 @@
             </intent-filter>
         </service>
         <service
+            android:name=".service.NetForwardService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.ayst.androidx.NETFORWARD_SERVICE" />
+            </intent-filter>
+        </service>
+        <service
             android:name=".service.KeyInterceptImplService"
             android:enabled="true"
             android:exported="true"

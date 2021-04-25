@@ -10,6 +10,7 @@ import com.ayst.androidx.service.AppEnableService;
 import com.ayst.androidx.service.AppLaunchService;
 import com.ayst.androidx.service.Log2fileService;
 import com.ayst.androidx.service.ModemService;
+import com.ayst.androidx.service.NetForwardService;
 import com.ayst.androidx.service.OtgService;
 import com.ayst.androidx.service.TimeRTCService;
 import com.ayst.androidx.service.WatchdogService;
@@ -33,6 +34,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             context.startService(new Intent(context, WatchdogService.class));
             context.startService(new Intent(context, OtgService.class));
             context.startService(new Intent(context, TimeRTCService.class));
+            context.startService(new Intent(context, NetForwardService.class));
 
             if (TextUtils.equals("1", AppUtils.getProperty(
                     "persist.androidx.key_intercept",
