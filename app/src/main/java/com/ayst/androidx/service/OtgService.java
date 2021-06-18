@@ -25,6 +25,8 @@ public class OtgService extends Service {
     private static final int OTG_TYPE_C = 1;        // TYPE-C
     private static final int OTG_TYPE_USB3 = 2;     // USB3.0
     private static final int OTG_TYPE_3326 = 3;     // RK3326
+    private static final int OTG_TYPE_356x = 4;     // RK356x
+
 
     private static final String USB_MODE_AUTO = "0";
     private static final String USB_MODE_HOST = "1";
@@ -43,6 +45,8 @@ public class OtgService extends Service {
                 "peripheral", "host", "otg"));
         sOtgs.add(new Otg("/sys/devices/platform/ff2c0000.syscon/ff2c0000.syscon:usb2-phy@100/otg_mode",
                 "peripheral", "host", "otg"));
+        sOtgs.add(new Otg("/sys/devices/platform/fe8a0000.usb2-phy/otg_mode","peripheral", "host", "otg"));
+
     }
 
     public OtgService() {
