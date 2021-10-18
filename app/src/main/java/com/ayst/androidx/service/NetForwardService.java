@@ -15,45 +15,51 @@ import java.util.Map;
 
 public class NetForwardService extends Service {
     private String TAG = "NetForwardService";
-    private String PROP_ENABLE = "persist.sys.netforward.enable";
-    private String PROP_ETH1_IP = "persist.sys.netforward.eth1.ip";
-    private String PROP_COMMAND_KEY = "persist.sys.netforward.cmdkey";
+
     private String CMD_VD28 = "VD28";
-    private String mPropCmdKey;
-    private String mPropeth1ip = "192.168.1.1";
-    private Map<String,  String []> mCMDmap= new HashMap<String, String []>();
 
-    Boolean mForwardONOFF = false;
-    public NetForwardService()
-    {
+    private String mCmdKey = CMD_VD28;
+    private String mIp = "192.168.1.1";
+    private Map<String, String[]> mCmdMap = new HashMap<String, String[]>();
+
+    private Runnable mNetForwardRunnable = new Runnable() {
+        @Override
+        public void run() {
+            ShellUtils.CommandResult result;
+            String[] cmds = mCmdMap.get(mCmdKey);
+            for (int i = 0; i < cmds.length; i++) {
+                result = ShellUtils.execCmd(cmds[i], true);
+                Log.i(TAG, cmds[i] + "\n: " + result.toString());
+            }
+        }
+    };
+
+    public NetForwardService() {
+
     }
-
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mForwardONOFF = TextUtils.equals("1", AppUtils.getProperty(PROP_ENABLE, "0"));
-        mPropCmdKey =  AppUtils.getProperty(PROP_COMMAND_KEY, "VD28");
-        mPropeth1ip = AppUtils.getProperty(PROP_ETH1_IP, "192.168.1.1");
-        Log.i(TAG,"onCreate mForwardONOFF = "+mForwardONOFF);
-        initCommandList();
+
+        mCmdKey = AppUtils.getProperty("persist.androidx.netforward.cmdkey", mCmdKey);
+        mIp = AppUtils.getProperty("persist.androidx.netforward.ip", mIp);
+
+        initCmds();
     }
 
-
-    void initCommandList()
-    {
-        String [] mVD28_CommandList = {
+    void initCmds() {
+        String[] vd28 = {
                 "iptables -F",
                 "iptables -X",
                 "iptables -t nat -F",
                 "busybox ifconfig eth1 up",
-                "busybox ifconfig eth1 "+mPropeth1ip,
+                "busybox ifconfig eth1 " + mIp,
                 "ip rule add from all lookup main pref 9999",
                 "echo 1 > /proc/sys/net/ipv4/ip_forward",
-                "iptables -t nat -A POSTROUTING -s "+mPropeth1ip+"/255.255.255.0 -o eth0 -j MASQUERADE",
+                "iptables -t nat -A POSTROUTING -s " + mIp + "/255.255.255.0 -o eth0 -j MASQUERADE",
         };
-        mCMDmap.put(CMD_VD28,mVD28_CommandList);
-        Log.i(TAG,"onCreate initCommandList ");
+        mCmdMap.put(CMD_VD28, vd28);
     }
 
     @Nullable
@@ -61,25 +67,13 @@ public class NetForwardService extends Service {
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    private Runnable setForward = new Runnable() {
-        @Override
-        public void run() {
-            ShellUtils.CommandResult result;
-            String [] CommandList = mCMDmap.get(mPropCmdKey);
-            for (int i = 0 ; i < CommandList.length ; i++)
-            {
-                result = ShellUtils.execCmd(CommandList[i],true);
-                Log.i(TAG, CommandList[i]+"\n=====: " + result.toString());
-            }
-        }
-    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (mForwardONOFF)
-        {
-            Thread t = new Thread(setForward);
-            t.start();
+        if (TextUtils.equals("1", AppUtils.getProperty(
+                "persist.androidx.netforward", "0"))) {
+            Thread thread = new Thread(mNetForwardRunnable);
+            thread.start();
         }
         return super.onStartCommand(intent, flags, startId);
     }
