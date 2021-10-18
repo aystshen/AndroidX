@@ -429,10 +429,14 @@ public class AppUtils {
                         }
                         sRootDir = dir;
                         return sRootDir;
+                    } else {
+                        Log.w(TAG, "getRootDir, external storage can't write");
                     }
+                } else {
+                    Log.w(TAG, "getRootDir, external storage unmounted");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "getRootDir, " + e.getMessage());
             }
             sRootDir = Environment.getDownloadCacheDirectory().getAbsolutePath();
         }
