@@ -22,8 +22,8 @@ public class WatchdogService extends Service {
 
     private static final int STATE_OFF = 0;
     private static final int STATE_ON = 1;
-    private static final int STATE_NONE = 2;
-    private int mState = STATE_NONE;
+    private static final int STATE_AUTO = 2;
+    private int mState = STATE_AUTO;
 
     private boolean mAlive = true;
     private int mTimeout;
@@ -132,15 +132,21 @@ public class WatchdogService extends Service {
         EventBus.getDefault().register(this);
 
         mState = Integer.parseInt(AppUtils.getProperty("persist.androidx.watchdog",
-                String.valueOf(STATE_NONE)));
+                String.valueOf(STATE_AUTO)));
         if (mState == STATE_ON) {
             Log.d(TAG, "onStartCommand, watchdog is on.");
             openWatchdog();
         } else if (mState == STATE_OFF) {
             Log.d(TAG, "onStartCommand, watchdog is off.");
             closeWatchdog();
-        } else if (mState == STATE_NONE) {
-            Log.d(TAG, "onStartCommand, watchdog is none.");
+        } else if (mState == STATE_AUTO) {
+            Log.d(TAG, "onStartCommand, watchdog is auto.");
+            if (mMcu.watchdogIsOpen()) {
+                if (mHeartbeatThread == null) {
+                    mHeartbeatThread = new Thread(mHeartbeatRunnable);
+                    mHeartbeatThread.start();
+                }
+            }
         }
 
         return super.onStartCommand(intent, flags, startId);
