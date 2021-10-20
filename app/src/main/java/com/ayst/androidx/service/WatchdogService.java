@@ -4,19 +4,30 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.ayst.androidx.IWatchdogService;
 import com.ayst.androidx.event.MessageEvent;
 import com.ayst.androidx.supply.Mcu;
 import com.ayst.androidx.util.AppUtils;
+import com.ayst.androidx.util.FileUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.IOException;
+
 public class WatchdogService extends Service {
     private static final String TAG = "WatchdogService";
+
+    /**
+     * 保存关机或升级前看门狗状态，以便重启后恢复。
+     */
+    private static final File RECOVERY_DIR = new File("/cache/recovery");
+    private static final File WATCHDOG_FLAG_FILE = new File(RECOVERY_DIR, "/last_watchdog_flag");
 
     private static final int TIMEOUT_MIN = 60;
 
@@ -30,19 +41,27 @@ public class WatchdogService extends Service {
     private Mcu mMcu;
     private Thread mHeartbeatThread;
 
-    public WatchdogService() {
-    }
+    /**
+     * 看门狗心跳线程
+     */
+    private Runnable mHeartbeatRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mAlive = true;
+            mTimeout = mMcu.getWatchdogDuration();
+            while (mAlive) {
+                Log.i(TAG, "run...");
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mMcu = new Mcu(this);
-    }
+                mMcu.heartbeat();
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mService;
-    }
+                try {
+                    Thread.sleep(mTimeout >= TIMEOUT_MIN ? mTimeout / 3 * 1000 : 30 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
     private final IWatchdogService.Stub mService = new IWatchdogService.Stub() {
         /**
@@ -125,6 +144,20 @@ public class WatchdogService extends Service {
         }
     };
 
+    public WatchdogService() {
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mMcu = new Mcu(this);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mService;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand...");
@@ -146,6 +179,8 @@ public class WatchdogService extends Service {
                     mHeartbeatThread = new Thread(mHeartbeatRunnable);
                     mHeartbeatThread.start();
                 }
+            } else if (checkWatchdogFlag()) {
+                openWatchdog();
             }
         }
 
@@ -210,24 +245,21 @@ public class WatchdogService extends Service {
     }
 
     /**
-     * 看门狗心跳线程
+     * 读取上一次关机或升级前的看门狗状态
+     *
+     * @return true:开 false:关
      */
-    private Runnable mHeartbeatRunnable = new Runnable() {
-        @Override
-        public void run() {
-            mAlive = true;
-            mTimeout = mMcu.getWatchdogDuration();
-            while (mAlive) {
-                Log.i(TAG, "run...");
-
-                mMcu.heartbeat();
-
-                try {
-                    Thread.sleep(mTimeout >= TIMEOUT_MIN ? mTimeout / 3 * 1000 : 30 * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+    private boolean checkWatchdogFlag() {
+        // 检查 last_flag
+        String flag = null;
+        try {
+            flag = FileUtils.readFile(WATCHDOG_FLAG_FILE);
+            WATCHDOG_FLAG_FILE.delete();
+        } catch (IOException e) {
+            Log.w(TAG, "checkWatchdogFlag, " + e.getMessage());
         }
-    };
+        Log.i(TAG, "checkWatchdogFlag, watchdog flag:" + flag);
+
+        return TextUtils.equals(flag, "watchdog=true");
+    }
 }
