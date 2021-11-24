@@ -42,8 +42,9 @@ public class NetForwardService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        mCmdKey = AppUtils.getProperty("persist.androidx.netforward.cmdkey", mCmdKey);
+        mCmdKey = AppUtils.getProperty("persist.androidx.netforward.key", mCmdKey);
         mIp = AppUtils.getProperty("persist.androidx.netforward.ip", mIp);
+        Log.i(TAG, "mCmdKey = "+mCmdKey + "mIp = "+mIp);
 
         initCmds();
     }
