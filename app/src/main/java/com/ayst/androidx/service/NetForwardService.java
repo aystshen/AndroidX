@@ -15,9 +15,7 @@ import java.util.Map;
 
 public class NetForwardService extends Service {
     private String TAG = "NetForwardService";
-
     private String CMD_VD28 = "VD28";
-
     private String mCmdKey = CMD_VD28;
     private String mIp = "192.168.1.1";
     private Map<String, String[]> mCmdMap = new HashMap<String, String[]>();
@@ -34,18 +32,14 @@ public class NetForwardService extends Service {
         }
     };
 
-    public NetForwardService() {
-
-    }
+    public NetForwardService() {}
 
     @Override
     public void onCreate() {
         super.onCreate();
-
         mCmdKey = AppUtils.getProperty("persist.androidx.netforward.key", mCmdKey);
         mIp = AppUtils.getProperty("persist.androidx.netforward.ip", mIp);
-        Log.i(TAG, "mCmdKey = "+mCmdKey + "mIp = "+mIp);
-
+        Log.i(TAG, "mCmdKey = " + mCmdKey + "mIp = " + mIp);
         initCmds();
     }
 

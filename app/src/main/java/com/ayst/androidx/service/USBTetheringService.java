@@ -29,7 +29,7 @@ public class USBTetheringService extends Service {
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.i(TAG,"run called");
+            Log.i(TAG, "run called");
             enableUSBteher();
             try {
                 Thread.sleep(1000);
@@ -47,26 +47,26 @@ public class USBTetheringService extends Service {
     public USBTetheringService() {
 
     }
-    public int enableUSBteher()
-    {
+
+    public int enableUSBteher() {
         ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        Method method = getMethod(ConnectivityManager.class,"setUsbTethering",boolean.class);
-        if (null == method)
-        {
-            Log.i(TAG,"callMethod failed");
+        Method method = getMethod(ConnectivityManager.class, "setUsbTethering", boolean.class);
+        if (null == method) {
+            Log.i(TAG, "callMethod failed");
             return -1;
         }
         int returnCode = 0;
         try {
-            returnCode = (Integer)method.invoke(connectivityManager, true);
-            Log.i(TAG,"callMethod over");
+            returnCode = (Integer) method.invoke(connectivityManager, true);
+            Log.i(TAG, "callMethod over");
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        return  returnCode;
+        return returnCode;
     }
+
     public Method getMethod(Class clazz, String methodName, Class<?>... parameterTypes) {
         Method method = null;
         try {
@@ -76,15 +76,13 @@ public class USBTetheringService extends Service {
         }
         return method;
     }
+
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = this;
-        Log.i(TAG,"onCreate");
+        Log.i(TAG, "onCreate");
     }
-
-
-
 
     @Nullable
     @Override
@@ -94,10 +92,10 @@ public class USBTetheringService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG,"onStartCommand begin");
+        Log.i(TAG, "onStartCommand begin");
         if (TextUtils.equals("1", AppUtils.getProperty(
                 "persist.androidx.usbtether", "0"))) {
-            Log.i(TAG,"onStartCommand in on persist.androidx.usbtether");
+            Log.i(TAG, "onStartCommand in on persist.androidx.usbtether");
             Thread thread = new Thread(mRunnable);
             thread.start();
         }
