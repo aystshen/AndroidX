@@ -92,6 +92,14 @@
             </intent-filter>
         </service>
         <service
+            android:name=".service.USBTetheringService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.ayst.androidx.USBTETHER_SERVICE" />
+            </intent-filter>
+        </service>
+        <service
             android:name=".service.KeyInterceptImplService"
             android:enabled="true"
             android:exported="true"
