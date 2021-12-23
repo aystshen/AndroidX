@@ -92,14 +92,6 @@
             </intent-filter>
         </service>
         <service
-            android:name=".service.USBTetheringService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.ayst.androidx.USBTETHER_SERVICE" />
-            </intent-filter>
-        </service>
-        <service
             android:name=".service.KeyInterceptImplService"
             android:enabled="true"
             android:exported="true"
@@ -123,6 +115,14 @@
             android:exported="true">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receiver.USBTetheringReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.hardware.usb.action.USB_STATE"/>
             </intent-filter>
         </receiver>
         <!--响应服务-->

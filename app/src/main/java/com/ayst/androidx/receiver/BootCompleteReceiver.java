@@ -15,7 +15,6 @@ import com.ayst.androidx.service.ModemService;
 import com.ayst.androidx.service.NetForwardService;
 import com.ayst.androidx.service.OtgService;
 import com.ayst.androidx.service.TimeRTCService;
-import com.ayst.androidx.service.USBTetheringService;
 import com.ayst.androidx.service.WatchdogService;
 import com.ayst.androidx.util.AppUtils;
 
@@ -38,7 +37,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             context.startService(new Intent(context, OtgService.class));
             context.startService(new Intent(context, TimeRTCService.class));
             context.startService(new Intent(context, NetForwardService.class));
-            context.startService(new Intent(context, USBTetheringService.class));
             if (TextUtils.equals("1", AppUtils.getProperty(
                     "persist.androidx.key_intercept",
                     "0"))) {
