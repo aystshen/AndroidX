@@ -139,6 +139,12 @@ public class USBTetheringReceiver extends BroadcastReceiver {
                     }
                     initIp();
                 }
+                if(connected && function_rndis)
+                {
+                    if (!checkIpExist()) {
+                        initIp();
+                    }
+                }
                 break;
             case Intent.ACTION_BOOT_COMPLETED:
 
@@ -156,6 +162,22 @@ public class USBTetheringReceiver extends BroadcastReceiver {
         }
     }
 
+    public Boolean checkIpExist()
+    {
+        ShellUtils.CommandResult result;
+        String regEx="((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)";
+        String value;
+        result = ShellUtils.execCmd("ifconfig usb0", true);
+        Log.i(TAG,  "checkIpExist \n: " + result.toString());
+        value = result.toString();
+        if(value.matches(regEx))
+        {
+            Log.i(TAG,  "checkIpExist return : " + true);
+            return true;
+        }
+        Log.i(TAG,  "checkIpExist return : " + false);
+        return false;
+    }
     public void initIp() {
         ShellUtils.CommandResult result;
         for (int i = 0; i < cmds.length; i++) {
@@ -174,7 +196,7 @@ public class USBTetheringReceiver extends BroadcastReceiver {
         int returnCode = 0;
         try {
             returnCode = (Integer) method.invoke(connectivityManager, true);
-            Log.i(TAG, "callMethod over");
+            Log.i(TAG, "callMethod over returnCode = "+returnCode);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
