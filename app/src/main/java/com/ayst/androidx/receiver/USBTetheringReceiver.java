@@ -131,8 +131,8 @@ public class USBTetheringReceiver extends BroadcastReceiver {
                 boolean function_midi = intent.getBooleanExtra(USB_FUNCTION_MIDI, false);
                 Log.i(TAG, "function_midi : " + function_midi);
                 if (connected && !function_rndis) {
-                    enableUSBteher();
                     try {
+                        enableUSBteher();
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -141,8 +141,10 @@ public class USBTetheringReceiver extends BroadcastReceiver {
                 }
                 break;
             case Intent.ACTION_BOOT_COMPLETED:
-                enableUSBteher();
+
                 try {
+                    Thread.sleep(1000);
+                    enableUSBteher();
                     Thread.sleep(1000);
                     initIp();
                 } catch (InterruptedException e) {
