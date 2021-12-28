@@ -13,6 +13,8 @@ import com.ayst.androidx.util.ShellUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class USBTetheringReceiver extends BroadcastReceiver {
 
@@ -166,11 +168,13 @@ public class USBTetheringReceiver extends BroadcastReceiver {
     {
         ShellUtils.CommandResult result;
         String regEx="((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)";
+        Pattern patten = Pattern.compile(regEx);
         String value;
         result = ShellUtils.execCmd("ifconfig usb0", true);
         Log.i(TAG,  "checkIpExist \n: " + result.toString());
         value = result.toString();
-        if(value.matches(regEx))
+        Matcher matcher = patten.matcher(value);
+        if(matcher.find())
         {
             Log.i(TAG,  "checkIpExist return : " + true);
             return true;
