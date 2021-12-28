@@ -98,9 +98,11 @@ public class OtgService extends Service {
                         Log.i(TAG, "setOtgMode, save");
                         AppUtils.setProperty("persist.androidx.otg_mode", mode);
                     }
-                    if (!TextUtils.equals(USB_MODE_HOST, mode)) {
-                        Log.i(TAG, "setOtgMode, [USB_MODE_DEVICE|USB_MODE_AUTO] Close the watchdog");
-                        EventBus.getDefault().post(new MessageEvent(MessageEvent.MSG_CLOSE_WATCHDOG));
+                    if (!TextUtils.equals(AppUtils.getProperty("persist.androidx.watchdogondebug", "0"), "1")) {
+                        if (!TextUtils.equals(USB_MODE_HOST, mode)) {
+                            Log.i(TAG, "setOtgMode, [USB_MODE_DEVICE|USB_MODE_AUTO] Close the watchdog");
+                            EventBus.getDefault().post(new MessageEvent(MessageEvent.MSG_CLOSE_WATCHDOG));
+                        }
                     }
                 }
             } else {
