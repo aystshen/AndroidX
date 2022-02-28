@@ -97,10 +97,12 @@ public class USBTetheringReceiver extends BroadcastReceiver {
     public static final String USB_FUNCTION_MIDI = "midi";
 
     Context mContext = null;
+    final String USB0_IP = "192.168.42.11";
+    final String USB0_GW = "192.168.42.10";
     String[] cmds = {
             "ifconfig usb0 up",
-            "ifconfig usb0 192.168.42.11",
-            "ip route add default via 192.168.42.10",
+            "ifconfig usb0 " + USB0_IP,
+            "ip route add default via " + USB0_GW,
             "ip rule add from all lookup main pref 9999",
     };
 
@@ -141,8 +143,7 @@ public class USBTetheringReceiver extends BroadcastReceiver {
                     }
                     initIp();
                 }
-                if(connected && function_rndis)
-                {
+                if (connected && function_rndis) {
                     if (!checkIpExist()) {
                         initIp();
                     }
@@ -160,28 +161,29 @@ public class USBTetheringReceiver extends BroadcastReceiver {
                 }
                 break;
             default:
-                Log.i(TAG,"default");
+                Log.i(TAG, "default");
         }
     }
 
-    public Boolean checkIpExist()
-    {
+    public Boolean checkIpExist() {
         ShellUtils.CommandResult result;
-        String regEx="((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)";
+        String regEx = "((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)";
         Pattern patten = Pattern.compile(regEx);
         String value;
         result = ShellUtils.execCmd("ifconfig usb0", true);
-        Log.i(TAG,  "checkIpExist \n: " + result.toString());
+        Log.i(TAG, "checkIpExist \n: " + result.toString());
         value = result.toString();
         Matcher matcher = patten.matcher(value);
-        if(matcher.find())
-        {
-            Log.i(TAG,  "checkIpExist return : " + true);
-            return true;
+        if (matcher.find()) {
+            if (matcher.group().equals(USB0_IP)) {
+                Log.i(TAG, "checkIpExist return : " + true);
+                return true;
+            }
         }
-        Log.i(TAG,  "checkIpExist return : " + false);
+        Log.i(TAG, "checkIpExist return : " + false);
         return false;
     }
+
     public void initIp() {
         ShellUtils.CommandResult result;
         for (int i = 0; i < cmds.length; i++) {
@@ -200,7 +202,7 @@ public class USBTetheringReceiver extends BroadcastReceiver {
         int returnCode = 0;
         try {
             returnCode = (Integer) method.invoke(connectivityManager, true);
-            Log.i(TAG, "callMethod over returnCode = "+returnCode);
+            Log.i(TAG, "callMethod over returnCode = " + returnCode);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
