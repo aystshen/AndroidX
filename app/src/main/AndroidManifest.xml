@@ -139,6 +139,8 @@
                 <action android:name="com.ayst.androidx.TIMERTC_SREVICE" />
             </intent-filter>
         </service>
+        <service android:name=".service.NetAdbSwitchService"
+            android:enabled="true"/>
     </application>
 
 </manifest>
