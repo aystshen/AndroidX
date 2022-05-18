@@ -16,6 +16,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
@@ -299,27 +300,39 @@ public class Log2fileService extends Service {
                     dos.flush();
                 }
 
-                BufferedReader bufferedReader = new BufferedReader(
-                        new InputStreamReader(process.getInputStream()));
+                InputStream is = process.getInputStream();
 
                 File kmsgFile = createKmsgFile();
                 fos = new FileOutputStream(kmsgFile, true);
 
                 int count = 0;
-                String line;
-                while (mAlive && (line = bufferedReader.readLine()) != null) {
-                    if (count < 10000) {
-                        fos.write(line.getBytes());
-                        fos.write("\n".getBytes());
-                    } else {
-                        if (kmsgFile.exists() && kmsgFile.length() > FILE_MAX_SIZE) {
-                            fos.close();
-                            kmsgFile = createKmsgFile();
-                            fos = new FileOutputStream(kmsgFile, true);
+                byte[] data = new byte[1024];
+                while (mAlive) {
+                    if (is.available() > 0) {
+                        int len = is.read(data);
+                        if (count < 10000) {
+                            fos.write(data, 0, len);
+                        } else {
+                            if (kmsgFile.exists() && kmsgFile.length() > FILE_MAX_SIZE) {
+                                fos.close();
+                                kmsgFile = createKmsgFile();
+                                fos = new FileOutputStream(kmsgFile, true);
+                            }
+                            count = 0;
                         }
-                        count = 0;
+                        count++;
+                    } else {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                        if (isRoot) {
+                            command = "cat proc/kmsg\n";
+                            dos.write(command.getBytes(Charset.forName("utf-8")));
+                            dos.flush();
+                        }
                     }
-                    count++;
                 }
 
                 Log.w(TAG, "Kmsg -> file exit.");
